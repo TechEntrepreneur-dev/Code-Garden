@@ -1,56 +1,136 @@
 <!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Secure Blink Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Responsive Secure Blink Chat</title>
   <style>
-    body { font-family: sans-serif; margin: 20px; }
-    #login, #chatUI { max-width: 400px; margin: auto; }
-    #messages { max-height: 200px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;}
-    #onlineUsers { margin-bottom: 10px; }
-    #onlineUsers li { list-style: none; }
-    input, button { padding: 8px; margin: 4px 0; width: 100%; box-sizing: border-box; }
-    .msg { margin-bottom: 5px; }
-    .timestamp { color: #888; font-size: 0.8em; margin-right: 5px; }
-    #anonBtn { background: #eee; }
-    #clearChat { background: #f88; color: white; }
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      background: #f5f5f5;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    #login, #chatUI {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+    #login input, #login button, #chatUI input, #chatUI button {
+      width: 100%;
+      max-width: 360px;
+      padding: 12px;
+      margin: 8px 0;
+      box-sizing: border-box;
+      font-size: 1em;
+    }
+    #chatUI {
+      display: none;
+    }
+    .header {
+      width: 100%;
+      max-width: 360px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    #onlineUsers {
+      width: 100%;
+      max-width: 360px;
+      margin-bottom: 8px;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    #onlineUsers li {
+      background: #fff;
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    .chat-wrapper {
+      flex: 1;
+      width: 100%;
+      max-width: 360px;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    #messages {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      background: #fafafa;
+    }
+    .msg { margin-bottom: 6px; }
+    .timestamp { color: #888; font-size: 0.75em; margin-right: 5px; }
+    .input-area {
+      display: flex;
+      padding: 8px;
+      background: #eee;
+    }
+    .input-area input {
+      flex: 1;
+      padding: 10px;
+      font-size: 1em;
+      border: none;
+      border-radius: 4px;
+      margin-right: 8px;
+    }
+    .input-area button {
+      padding: 10px 16px;
+      font-size: 1em;
+      border: none;
+      border-radius: 4px;
+      background: #0084ff;
+      color: #fff;
+    }
+    #clearChat { background: #f44336; color: #fff; }
   </style>
 </head>
 <body>
-  <div id="login">
-    <h2>Sign In</h2>
-    <input id="email"    type="email"    placeholder="Email (leave blank for guest)" />
-    <input id="password" type="password" placeholder="Password (leave blank for guest)" />
-    <button id="btnLogin">Log In / Register</button>
-    <button id="btnAnon"  style="margin-top:8px;">Continue as Guest</button>
-  </div>  <div id="chatUI" style="display:none;">
-    <h2>Blink Chat</h2>
-    <div>
-      Signed in as <strong id="displayName"></strong>
-      <button id="btnLogout" style="width:auto; float:right;">Log Out</button>
-    </div>
-    <h4>Online Users</h4>
-    <ul id="onlineUsers"></ul>
+  <div class="container">
+    <div id="login">
+      <h2>Sign In</h2>
+      <input id="email" type="email" placeholder="Email (leave blank for guest)" />
+      <input id="password" type="password" placeholder="Password (leave blank for guest)" />
+      <button id="btnLogin">Log In / Register</button>
+      <button id="btnAnon">Continue as Guest</button>
+    </div><div id="chatUI">
+  <div class="header">
+    <span>Signed in as <strong id="displayName"></strong></span>
+    <button id="btnLogout">Log Out</button>
+  </div>
+  <ul id="onlineUsers"></ul>
+  <div class="chat-wrapper">
     <div id="messages"></div>
-    <input id="input" placeholder="Type a message…" />
-    <button id="send">Send</button>
-    <button id="clearChat">Clear Chat</button>
-  </div>  <script type="module">
-    import { initializeApp }    from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import {
-      getDatabase, ref, push, onChildAdded,
-      onValue, set, serverTimestamp, onDisconnect, remove
-    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
-    import {
-      getAuth,
-      signInWithEmailAndPassword,
-      createUserWithEmailAndPassword,
-      signInAnonymously,
-      onAuthStateChanged,
-      signOut,
-      updateProfile
-    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    <div class="input-area">
+      <input id="input" placeholder="Type a message…" />
+      <button id="send">Send</button>
+    </div>
+  </div>
+  <button id="clearChat">Clear Chat</button>
+</div>
 
-    // ─── 1. CONFIG & INIT ───────────────────────────────────
+  </div>  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getDatabase, ref, push, onChildAdded, onValue, set, serverTimestamp, onDisconnect, remove } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+
     const firebaseConfig = {
       apiKey: "AIzaSyAYA5pjoxFuxH2Kzo_eDSqTZPDkYXOZU8s",
       authDomain: "blink-chat-hd.firebaseapp.com",
@@ -61,132 +141,99 @@
       appId: "1:712857952183:web:47a623b806093d3f021232",
       measurementId: "G-T9TWHCT6KP"
     };
-    const app  = initializeApp(firebaseConfig);
-    const db   = getDatabase(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
     const auth = getAuth(app);
 
-    // ─── 2. UI REFS ──────────────────────────────────────────
-    const loginDiv    = document.getElementById('login');
-    const chatDiv     = document.getElementById('chatUI');
-    const emailEl     = document.getElementById('email');
-    const passEl      = document.getElementById('password');
-    const btnLogin    = document.getElementById('btnLogin');
-    const btnAnon     = document.getElementById('btnAnon');
-    const btnLogout   = document.getElementById('btnLogout');
-    const nameEl      = document.getElementById('displayName');
-    const messagesEl  = document.getElementById('messages');
-    const inputEl     = document.getElementById('input');
-    const sendBtn     = document.getElementById('send');
-    const clearBtn    = document.getElementById('clearChat');
-    const usersList   = document.getElementById('onlineUsers');
+    // UI Refs
+    const loginDiv = document.getElementById('login');
+    const chatDiv = document.getElementById('chatUI');
+    const emailEl = document.getElementById('email');
+    const passEl = document.getElementById('password');
+    const btnLogin = document.getElementById('btnLogin');
+    const btnAnon = document.getElementById('btnAnon');
+    const btnLogout = document.getElementById('btnLogout');
+    const nameEl = document.getElementById('displayName');
+    const messagesEl = document.getElementById('messages');
+    const inputEl = document.getElementById('input');
+    const sendBtn = document.getElementById('send');
+    const clearBtn = document.getElementById('clearChat');
+    const usersList = document.getElementById('onlineUsers');
 
-    // ─── 3. AUTH FLOW ────────────────────────────────────────
+    // Auth flow
     btnLogin.onclick = () => {
-      const email = emailEl.value.trim();
-      const pass  = passEl.value.trim();
-      if (!email || !pass) {
-        alert("Email & password required for registered users. Or click 'Continue as Guest'.");
-        return;
-      }
-      signInWithEmailAndPassword(auth, email, pass)
-        .catch(err => {
-          if (err.code === 'auth/user-not-found') {
-            return createUserWithEmailAndPassword(auth, email, pass);
-          } else {
-            alert(err.message);
-          }
-        });
+      const email = emailEl.value.trim(), pass = passEl.value.trim();
+      if (!email || !pass) return alert("Provide email & password or use Guest.");
+      signInWithEmailAndPassword(auth, email, pass).catch(err => {
+        if (err.code === 'auth/user-not-found') createUserWithEmailAndPassword(auth, email, pass);
+        else alert(err.message);
+      });
     };
-
-    btnAnon.onclick = () => {
-      signInAnonymously(auth)
-        .catch(err => alert("Anonymous sign-in failed: " + err.message));
-    };
-
+    btnAnon.onclick = () => signInAnonymously(auth).catch(err => alert(err.message));
     btnLogout.onclick = () => signOut(auth);
 
     onAuthStateChanged(auth, user => {
       if (user) {
         loginDiv.style.display = 'none';
-        chatDiv.style.display  = 'block';
-        // For both anon and registered, prompt for name if not set
+        chatDiv.style.display = 'flex';
         if (!user.displayName) {
-          const dn = prompt("Enter your display name:", user.isAnonymous ? "" : "Anon");
-          updateProfile(user, { displayName: dn || (user.isAnonymous ? 'Guest' : 'Anon') })
-            .then(() => setupAfterAuth(user))
-            .catch(console.error);
-        } else {
-          setupAfterAuth(user);
-        }
+          const dn = prompt("Enter your name:", user.isAnonymous ? '' : '');
+          updateProfile(user, { displayName: dn || (user.isAnonymous ? 'Guest' : 'Anon') }).then(() => initUser(user));
+        } else initUser(user);
       } else {
-        chatDiv.style.display  = 'none';
-        loginDiv.style.display = 'block';
+        loginDiv.style.display = 'flex';
+        chatDiv.style.display = 'none';
         messagesEl.innerHTML = '';
-        usersList.innerHTML  = '';
+        usersList.innerHTML = '';
       }
     });
 
-    function setupAfterAuth(user) {
+    function initUser(user) {
       nameEl.textContent = user.displayName;
-      initPresence(user);
-      startChat();
-      watchUsers();
+      setupPresence(user);
+      loadChat();
+      loadUsers();
     }
 
-    // ─── 4. PRESENCE ─────────────────────────────────────────
-    function initPresence(user) {
+    function setupPresence(user) {
       const presRef = ref(db, `presence/${user.uid}`);
       set(presRef, { name: user.displayName, online: true });
       onDisconnect(presRef).set({ name: user.displayName, online: false });
     }
-
-    function watchUsers() {
-      const presRoot = ref(db, 'presence');
-      onValue(presRoot, snap => {
+    function loadUsers() {
+      onValue(ref(db, 'presence'), snap => {
         usersList.innerHTML = '';
-        snap.forEach(child => {
-          const { name, online } = child.val();
+        snap.forEach(c => {
+          const { name, online } = c.val();
           const li = document.createElement('li');
-          li.textContent = name + (online ? ' 🟢' : ' 🔴');
-          usersList.appendChild(li);
+          li.textContent = `${name} ${online ? '🟢' : '🔴'}`;
+          usersList.append(li);
         });
       });
     }
-
-    // ─── 5. CHAT ──────────────────────────────────────────────
-    function startChat() {
-      const chatsRef = ref(db, 'chats');
-      onChildAdded(chatsRef, snapshot => {
-        const { text, ts, sender } = snapshot.val();
+    function loadChat() {
+      onChildAdded(ref(db, 'chats'), snap => {
+        const { text, ts, sender } = snap.val();
         const div = document.createElement('div');
-        div.classList.add('msg');
+        div.className = 'msg';
         const time = new Date(ts).toLocaleTimeString();
         div.innerHTML = `<span class="timestamp">[${time}]</span><strong>${sender}:</strong> ${text}`;
-        messagesEl.appendChild(div);
+        messagesEl.append(div);
         messagesEl.scrollTop = messagesEl.scrollHeight;
       });
     }
-
-    function sendMessage() {
+    sendBtn.onclick = () => {
       const txt = inputEl.value.trim();
       if (!txt) return;
-      push(ref(db, 'chats'), {
-        text: txt,
-        ts: serverTimestamp(),
-        sender: auth.currentUser.displayName
-      });
+      push(ref(db, 'chats'), { text: txt, ts: serverTimestamp(), sender: auth.currentUser.displayName });
       inputEl.value = '';
-    }
-
-    function clearChat() {
-      if (confirm('Clear all chat history for everyone?')) {
-        remove(ref(db, 'chats')).catch(err => alert('Failed to clear: ' + err.message));
+    };
+    clearBtn.onclick = () => {
+      if (confirm('Clear chat history?')) {
+        remove(ref(db, 'chats'));
         messagesEl.innerHTML = '';
       }
-    }
-
-    sendBtn.onclick = sendMessage;
-    inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
-    clearBtn.onclick = clearChat;
+    };
+    inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') sendBtn.click(); });
   </script></body>
 </html>
