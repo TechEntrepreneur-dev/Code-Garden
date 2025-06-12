@@ -1,77 +1,53 @@
-<!-- Professional Single-file TimeFlow App: index.html --><!DOCTYPE html><html lang="en">
+<!-- Professional Single-file TimeFlow App (Debugged): index.html --><!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TimeFlow</title>
-  <!-- Tailwind via CDN -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Heroicons -->
-  <script src="https://unpkg.com/heroicons@2.0.13/dist/outline.js"></script>
-  <!-- React & ReactDOM -->
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-  <!-- Babel for JSX in-browser -->
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-    :root {
-      --primary: #4f46e5;
-      --primary-light: #6366f1;
-      --bg-gradient: linear-gradient(135deg, #f9fafb 0%, #eef2ff 100%);
-    }
     body {
       font-family: 'Inter', sans-serif;
-      background: var(--bg-gradient);
-      color: #374151;
-    }
-    .btn-primary {
-      background-color: var(--primary);
-    }
-    .btn-primary:hover {
-      background-color: var(--primary-light);
-    }
-    .card {
-      background: #ffffff;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
-    }
-    .modal-backdrop {
-      backdrop-filter: blur(4px);
-    }
-    .timeline-line {
-      background: linear-gradient(to bottom, var(--primary) 0%, var(--primary) var(--progress), #e5e7eb var(--progress), #e5e7eb 100%);
+      background: linear-gradient(135deg, #f9fafb 0%, #eef2ff 100%);
     }
   </style>
 </head>
 <body>
-  <div id="root"></div>  <script type="text/babel">
+  <div id="root"></div>  <!-- React & Babel -->  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>  <script type="text/babel">
     const { useState, useEffect } = React;
-    // Storage helpers
-    const load = (k) => JSON.parse(localStorage.getItem(k) || '[]');
-    const save = (k, items) => localStorage.setItem(k, JSON.stringify(items));
+    // LocalStorage helpers
     const KEY_ITEMS = 'timeflow-items';
     const KEY_REFS = 'timeflow-reflections';
+    const load = (key) => JSON.parse(localStorage.getItem(key) || '[]');
+    const save = (key, data) => localStorage.setItem(key, JSON.stringify(data));
 
     function App() {
       const [view, setView] = useState('inbox');
       return (
         <div className="min-h-screen">
-          <header className="bg-white shadow-sm">
-            <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-              <h1 className="text-2xl font-bold text-var(--primary)">TimeFlow</h1>
+          <header className="bg-white shadow sticky top-0 z-10">
+            <div className="max-w-3xl mx-auto px-4 py-4 flex justify-between">
+              <h1 className="text-2xl font-bold text-indigo-600">TimeFlow</h1>
               <nav className="space-x-4">
                 {['inbox','timeline','reflection'].map(v => (
-                  <button key={v}
+                  <button
+                    key={v}
                     onClick={() => setView(v)}
-                    className={`px-4 py-2 font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-var(--primary) ${
-                      view===v ? 'bg-var(--primary-light) text-white' : 'text-gray-600 hover:text-var(--primary)'
-                    }`}>
-                    {v.charAt(0).toUpperCase()+v.slice(1)}
+                    className={
+                      `px-4 py-2 rounded-md font-medium focus:outline-none focus:ring-2 ` +
+                      (view === v
+                        ? 'bg-indigo-600 text-white'
+                        : 'text-gray-600 hover:text-indigo-600')
+                    }
+                  >
+                    {v.charAt(0).toUpperCase() + v.slice(1)}
                   </button>
                 ))}
               </nav>
             </div>
           </header>
-          <main className="container mx-auto px-6 py-8">
+          <main className="max-w-3xl mx-auto px-4 py-6 space-y-8">
             {view === 'inbox' && <Inbox />}
             {view === 'timeline' && <Timeline />}
             {view === 'reflection' && <Reflection />}
@@ -82,67 +58,108 @@
 
     function Inbox() {
       const [items, setItems] = useState(load(KEY_ITEMS));
-      const [modal, setModal] = useState(false);
-      const [f, setF] = useState({type:'Task',title:'',date:'',time:'',repeat:false});
+      const [show, setShow] = useState(false);
+      const [form, setForm] = useState({type:'Task', title:'', date:'', time:'', repeat:false});
 
       useEffect(() => save(KEY_ITEMS, items), [items]);
 
-      const addItem = () => {
-        if(!f.title || !f.date || !f.time) return;
-        setItems([...items, {id: Date.now(), ...f, completed: false}]);
-        setModal(false);
-        setF({type:'Task',title:'',date:'',time:'',repeat:false});
+      const add = () => {
+        if (!form.title || !form.date || !form.time) return;
+        setItems([...items, {...form, id: Date.now(), completed: false}]);
+        setShow(false);
+        setForm({type:'Task', title:'', date:'', time:'', repeat:false});
       };
 
       return (
         <div>
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold">Inbox</h2>
-            <button onClick={() => setModal(true)}
-              className="btn-primary text-white px-5 py-2 rounded-md shadow hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-indigo-300">
-              <icons.plus className="w-5 h-5 inline-block mr-1"/> Add
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold text-gray-800">Inbox</h2>
+            <button
+              onClick={() => setShow(true)}
+              className="px-4 py-2 bg-indigo-600 text-white rounded-md shadow hover:bg-indigo-700 focus:outline-none"
+            >
+              + Add
             </button>
           </div>
-          <div className="space-y-4">
-            {items.sort((a,b)=> new Date(a.date+' '+a.time) - new Date(b.date+' '+b.time)).map(item => (
-              <div key={item.id} className="card p-4 rounded-md flex justify-between items-center hover:shadow-md transition-shadow">
+          <div className="mt-4 space-y-4">
+            {items.sort((a,b) => new Date(a.date + ' ' + a.time) - new Date(b.date + ' ' + b.time)).map(i => (
+              <div key={i.id} className="flex justify-between items-center bg-white p-4 rounded-md shadow">
                 <div>
-                  <div className="font-semibold text-gray-800">{item.title}</div>
-                  <div className="text-sm text-gray-500">[{item.type}] • {item.date} • {item.time}</div>
+                  <div className="font-semibold text-gray-800">{i.title}</div>
+                  <div className="text-sm text-gray-500">[{i.type}] • {i.date} • {i.time}</div>
                 </div>
-                <input type="checkbox" checked={item.completed}
-                  onChange={() => setItems(items.map(i => i.id===item.id ? {...i, completed: !i.completed} : i))}
-                  className="w-6 h-6 text-var(--primary) focus:ring-var(--primary)"/>
+                <input
+                  type="checkbox"
+                  checked={i.completed}
+                  onChange={() =>
+                    setItems(
+                      items.map(x => (x.id === i.id ? {...x, completed: !x.completed} : x))
+                    )
+                  }
+                  className="w-6 h-6 text-indigo-600 focus:ring-indigo-400"
+                />
               </div>
             ))}
           </div>
 
-          {modal && (
-            <div className="modal-backdrop fixed inset-0 flex items-center justify-center">
-              <div className="bg-white card rounded-lg p-6 w-full max-w-md">
+          {show && (
+            <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+              <div className="bg-white p-6 rounded-md shadow-lg w-full max-w-md">
                 <h3 className="text-lg font-semibold mb-4">New Item</h3>
-                <div className="space-y-4">
-                  <select className="w-full p-2 border rounded-md focus:ring-var(--primary) focus:border-var(--primary)"
-                    value={f.type} onChange={e=>setF({...f,type:e.target.value})}>
-                    <option>Task</option><option>Habit</option><option>Checklist</option>
+                <div className="space-y-3">
+                  <select
+                    value={form.type}
+                    onChange={e => setForm({...form, type: e.target.value})}
+                    className="w-full p-2 border rounded-md focus:border-indigo-400 focus:ring-indigo-400"
+                  >
+                    <option>Task</option>
+                    <option>Habit</option>
+                    <option>Checklist</option>
                   </select>
-                  <input className="w-full p-2 border rounded-md focus:ring-var(--primary) focus:border-var(--primary)"
-                    placeholder="Title" value={f.title} onChange={e=>setF({...f,title:e.target.value})}/>
+                  <input
+                    type="text"
+                    placeholder="Title"
+                    value={form.title}
+                    onChange={e => setForm({...form, title: e.target.value})}
+                    className="w-full p-2 border rounded-md focus:border-indigo-400 focus:ring-indigo-400"
+                  />
                   <div className="flex space-x-2">
-                    <input type="date" className="flex-1 p-2 border rounded-md focus:ring-var(--primary) focus:border-var(--primary)"
-                      value={f.date} onChange={e=>setF({...f,date:e.target.value})}/>
-                    <input type="time" className="flex-1 p-2 border rounded-md focus:ring-var(--primary) focus:border-var(--primary)"
-                      value={f.time} onChange={e=>setF({...f,time:e.target.value})}/>
+                    <input
+                      type="date"
+                      value={form.date}
+                      onChange={e => setForm({...form, date: e.target.value})}
+                      className="flex-1 p-2 border rounded-md focus:border-indigo-400 focus:ring-indigo-400"
+                    />
+                    <input
+                      type="time"
+                      value={form.time}
+                      onChange={e => setForm({...form, time: e.target.value})}
+                      className="flex-1 p-2 border rounded-md focus:border-indigo-400 focus:ring-indigo-400"
+                    />
                   </div>
                   <label className="inline-flex items-center space-x-2">
-                    <input type="checkbox" checked={f.repeat} onChange={e=>setF({...f,repeat:e.target.checked})}
-                      className="w-5 h-5 text-var(--primary) focus:ring-var(--primary)" />
+                    <input
+                      type="checkbox"
+                      checked={form.repeat}
+                      onChange={e => setForm({...form, repeat: e.target.checked})}
+                      className="w-5 h-5 text-indigo-600 focus:ring-indigo-400"
+                    />
                     <span>Repeat</span>
                   </label>
                 </div>
-                <div className="mt-6 flex justify-end space-x-4">
-                  <button onClick={()=>setModal(false)} className="px-4 py-2 text-gray-600 rounded-md hover:bg-gray-100 focus:outline-none">Cancel</button>
-                  <button onClick={addItem} className="btn-primary text-white px-4 py-2 rounded-md shadow hover:opacity-90">Save</button>
+                <div className="mt-6 flex justify-end space-x-3">
+                  <button
+                    onClick={() => setShow(false)}
+                    className="px-4 py-2 text-gray-600 rounded-md hover:bg-gray-100 focus:outline-none"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={add}
+                    className="px-4 py-2 bg-indigo-600 text-white rounded-md shadow hover:bg-indigo-700 focus:outline-none"
+                  >
+                    Save
+                  </button>
                 </div>
               </div>
             </div>
@@ -155,21 +172,31 @@
       const [items, setItems] = useState(load(KEY_ITEMS));
       useEffect(() => save(KEY_ITEMS, items), [items]);
       const now = new Date();
-      const progress = Math.min((now.getHours()*60+now.getMinutes())/(24*60)*100,100) + '%';
+      const progress = Math.min((now.getHours()*60 + now.getMinutes()) / (24*60) * 100, 100) + '%';
 
       return (
         <div className="relative">
-          <div className="absolute left-20 top-0 bottom-0 w-1 timeline-line rounded-full" style={{'--progress': progress}}></div>
-          <ul className="pl-28 space-y-8">
-            {items.sort((a,b)=> new Date(a.date+' '+a.time)- new Date(b.date+' '+b.time)).map(item => (
-              <li key={item.id} className="timeline-item relative flex items-center space-x-4">
-                <span className="w-24 text-right text-sm text-gray-500">{item.time}</span>
-                <input type="checkbox" checked={item.completed}
-                  onChange={()=>setItems(items.map(i => i.id===item.id?{...i,completed:!i.completed}:i))}
-                  className="w-6 h-6 text-var(--primary) focus:ring-var(--primary)"/>
-                <div className="card p-4 rounded-md flex-1 shadow-sm hover:shadow-md transition-shadow">
-                  <div className="font-semibold text-gray-800">{item.title}</div>
-                  <div className="text-xs text-gray-500 mt-1">[{item.type}] • {item.date}</div>
+          <div
+            className="absolute left-24 top-0 bottom-0 w-1 bg-gray-200 rounded-full"
+            style={{background: `linear-gradient(to bottom, #4f46e5 0%, #4f46e5 ${progress}, #e5e7eb ${progress}, #e5e7eb 100%)`}}
+          ></div>
+          <ul className="pl-32 space-y-8">
+            {items.sort((a,b) => new Date(a.date + ' ' + a.time) - new Date(b.date + ' ' + b.time)).map(i => (
+              <li key={i.id} className="flex items-center space-x-4">
+                <span className="w-28 text-right text-sm text-gray-500">{i.time}</span>
+                <input
+                  type="checkbox"
+                  checked={i.completed}
+                  onChange={() =>
+                    setItems(
+                      items.map(x => (x.id === i.id ? {...x, completed: !x.completed} : x))
+                    )
+                  }
+                  className="w-6 h-6 text-indigo-600 focus:ring-indigo-400"
+                />
+                <div className="card p-4 rounded-md shadow-sm flex-1">
+                  <div className="font-semibold text-gray-800">{i.title}</div>
+                  <div className="text-xs text-gray-500 mt-1">[{i.type}] • {i.date}</div>
                 </div>
               </li>
             ))}
@@ -180,45 +207,66 @@
 
     function Reflection() {
       const [entries, setEntries] = useState(load(KEY_REFS));
-      const [f, setF] = useState({well:'',improve:'',notes:''});
+      const [form, setForm] = useState({well:'', improve:'', notes:''});
 
-      const addRef = () => {
+      const saveRef = () => {
         const date = new Date().toISOString().slice(0,10);
-        const entry = {date, ...f};
+        const entry = {date, ...form};
         const updated = [entry, ...entries];
         setEntries(updated);
         save(KEY_REFS, updated);
-        setF({well:'',improve:'',notes:''});
+        setForm({well:'', improve:'', notes:''});
       };
 
       return (
         <div>
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold">Reflection</h2>
-            <button onClick={addRef} className="btn-primary text-white px-5 py-2 rounded-md shadow hover:opacity-90">Save Reflection</button>
+            <h2 className="text-xl font-semibold text-gray-800">Reflection</h2>
+            <button
+              onClick={saveRef}
+              className="px-4 py-2 bg-indigo-600 text-white rounded-md shadow hover:bg-indigo-700 focus:outline-none"
+            >
+              Save Reflection
+            </button>
           </div>
           <div className="space-y-4 mb-8">
-            <textarea rows={2} placeholder="What went well today?" className="w-full p-3 border rounded-md focus:ring-var(--primary) focus:border-var(--primary)"
-              value={f.well} onChange={e=>setF({...f,well:e.target.value})}/>
-            <textarea rows={2} placeholder="What can improve?" className="w-full p-3 border rounded-md focus:ring-var(--primary) focus:border-var(--primary)"
-              value={f.improve} onChange={e=>setF({...f,improve:e.target.value})}/>
-            <textarea rows={3} placeholder="Notes" className="w-full p-3 border rounded-md focus:ring-var(--primary) focus:border-var(--primary)"
-              value={f.notes} onChange={e=>setF({...f,notes:e.target.value})}/>
+            <textarea
+              rows={2}
+              placeholder="What went well today?"
+              value={form.well}
+              onChange={e => setForm({...form, well: e.target.value})}
+              className="w-full p-3 border rounded-md focus:border-indigo-400 focus:ring-indigo-400"
+            ></textarea><textarea
+          rows={2}
+          placeholder="What can improve?"
+          value={form.improve}
+          onChange={e => setForm({...form, improve: e.target.value})}
+          className="w-full p-3 border rounded-md focus:border-indigo-400 focus:ring-indigo-400"
+        ></textarea>
+        <textarea
+          rows={3}
+          placeholder="Notes"
+          value={form.notes}
+          onChange={e => setForm({...form, notes: e.target.value})}
+          className="w-full p-3 border rounded-md focus:border-indigo-400 focus:ring-indigo-400"
+        ></textarea>
+      </div>
+      <div className="space-y-6">
+        {entries.map((e, idx) => (
+          <div key={idx} className="card p-4 rounded-md shadow-sm">
+            <div className="text-xs text-gray-500 mb-2">{e.date}</div>
+            <p><strong>Well:</strong> {e.well}</p>
+            <p><strong>Improve:</strong> {e.improve}</p>
+            <p><strong>Notes:</strong> {e.notes}</p>
           </div>
-          <div className="space-y-6">
-            {entries.map((e,idx)=>(
-              <div key={idx} className="card p-4 rounded-md shadow-sm hover:shadow-md transition-shadow">
-                <div className="text-xs text-gray-500 mb-1">{e.date}</div>
-                <p><span className="font-semibold">Well:</span> {e.well}</p>
-                <p><span className="font-semibold">Improve:</span> {e.improve}</p>
-                <p><span className="font-semibold">Notes:</span> {e.notes}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      );
-    }
+        ))}
+      </div>
+    </div>
+  );
+}
 
-    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
-  </script></body>
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+
+  </script>
+</body>
 </html>
