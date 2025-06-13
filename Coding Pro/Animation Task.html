@@ -1,0 +1,56 @@
+<style>
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+  .divin {
+    height: 100px;
+    width: 100px;
+    border: 3px solid blue;
+    animation-name: DivIn;
+    animation-duration: 6s;
+  }
+  .divout {
+    height: 150px;
+    width: 150px;
+    border: 3px solid red;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation-name: DivOut;
+    animation-duration: 6s;
+  }
+  @keyframes DivIn {
+    0% {
+      transform: scale(1.5);
+    }
+    50% {
+      transform: scale(3);
+    }
+    100% {
+      transform: scale(1.5);
+    }
+  }
+  
+  @keyframes DivOut {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(2);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+</style>
+
+<body>
+  <center>
+<div class="divout">
+  <div class="divin">
+  </div>
+</div>
+</center>
+</body>
