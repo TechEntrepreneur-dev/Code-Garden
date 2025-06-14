@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>MentorAI</title>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg: #fff; --fg: #000; --card: #f5f5f5;
+    }
+    [data-theme="dark"] {
+      --bg: #121212; --fg: #eee; --card: #1e1e1e;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: sans-serif;
+      background: var(--bg); color: var(--fg);
+    }
+    header { display: flex; gap: 1rem; padding: 1rem; background: var(--card); }
+    header button { padding: .5rem 1rem; }
+    main { padding: 1rem; }
+    section { display: none; }
+    section.active { display: block; }
+    .card { background: var(--card); padding: 1rem; margin-bottom: 1rem; border-radius: 4px; }
+    label { display: block; margin-top: .5rem; }
+    input, select, textarea, button { width: 100%; padding: .5rem; margin-top: .25rem; }
+    #chatLog { background: var(--bg); border: 1px solid #888; height: 150px; overflow-y: auto; padding: .5rem; }
+    .streaks { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .badge { background: #4caf50; color: white; padding: .25rem .5rem; border-radius: 12px; }
+    #hiddenNegative { display: none; }
+  </style>
+</head>
+<body data-theme="light">
+
+<header>
+  <button id="tabManual">Manual</button>
+  <button id="tabAI">AI Chat</button>
+  <button id="toggleTheme">🌙 Dark Mode</button>
+</header>
+
+<main>
+  <!-- MANUAL SECTION -->
+  <section id="manual" class="active">
+    <!-- AUTH CARD -->
+    <div id="auth" class="card">
+      <h2>Sign In / Sign Up</h2>
+      <input id="email" type="email" placeholder="Email" />
+      <input id="password" type="password" placeholder="Password" />
+      <button id="btnSignUp">Sign Up</button>
+      <button id="btnLogIn">Log In</button>
+    </div>
+
+    <!-- ONBOARDING CARD -->
+    <div id="onboarding" class="card">
+      <h2>Onboarding</h2>
+      <label>Top 3 Goals (comma-separated)
+        <input id="goals" placeholder="e.g. Run, Code, Read" />
+      </label>
+      <label>Positive Habits to Track (comma-separated)
+        <input id="posHabits" placeholder="e.g. Sleep, Exercise" />
+      </label>
+      <label>Negative Habits to Curb (comma-separated)
+        <input id="negHabits" placeholder="e.g. Smoking, Junk Food" />
+      </label>
+      <label>Mentoring Style
+        <select id="style">
+          <option value="encouraging">Encouraging</option>
+          <option value="strict">Strict</option>
+        </select>
+      </label>
+      <button id="btnSaveProfile">Save Profile</button>
+    </div>
+
+    <!-- DASHBOARD CARD -->
+    <div id="dashboard" class="card">
+      <h2>Dashboard</h2>
+      <p>Today's Completion: <span id="percent">0%</span></p>
+      <canvas id="chart" width="400" height="200"></canvas>
+      <h3>Positive Streaks</h3>
+      <div id="posStreaks" class="streaks"></div>
+      <button id="showNeg">Show Hidden Negative Streaks</button>
+      <div id="hiddenNegative">
+        <h3>Negative Streaks (hidden)</h3>
+        <div id="negStreaks" class="streaks"></div>
+      </div>
+    </div>
+
+    <!-- HABIT LOGGER CARD -->
+    <div id="habit-logger" class="card">
+      <h2>Log a Habit</h2>
+      <div id="habitButtons"></div>
+    </div>
+
+    <button id="logout" class="card">Log Out</button>
+  </section>
+
+  <!-- AI CHAT SECTION -->
+  <section id="aiChat">
+    <div class="card">
+      <h2>Configure Gemini API</h2>
+      <input id="geminiKey" type="password" placeholder="Your Gemini API Key" />
+      <button id="saveGeminiKey">Save Key</button>
+    </div>
+    <div class="card">
+      <h2>Chat with MentorAI</h2>
+      <div id="chatLog"></div>
+      <textarea id="chatInput" placeholder="Type a message…"></textarea>
+      <button id="btnSend">Send</button>
+    </div>
+  </section>
+</main>
+
+<script>
+  // -------- FIREBASE CONFIG & INIT --------
+  const firebaseConfig = {
+    apiKey: "AIzaSyC6pzBwlechsYaSMr9JHsupez_ANKJ9GKw",
+    authDomain: "ai-self-improvement-mentor.firebaseapp.com",
+    projectId: "ai-self-improvement-mentor",
+    storageBucket: "ai-self-improvement-mentor.appspot.com",
+    messagingSenderId: "997450829221",
+    appId: "1:997450829221:web:72df99f1f08b5ccf8cac4c"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db   = firebase.firestore();
+  const msg  = firebase.messaging();
+
+  // -------- SERVICE WORKER REGISTRATION FOR FCM --------
+  navigator.serviceWorker.register('firebase-messaging-sw.js')
+    .then((registration) => {
+      msg.useServiceWorker(registration);
+      console.log('Service Worker registered for FCM');
+      // ask user permission & get token
+      return msg.requestPermission()
+        .then(() => msg.getToken());
+    })
+    .then(token => {
+      console.log('FCM Token:', token);
+      // TODO: send token to your backend if you have one
+    })
+    .catch(err => console.warn('SW/FCM setup failed', err));
+
+  // Handle foreground messages
+  msg.onMessage(payload => {
+    alert(`🔔 ${payload.notification.title}\n${payload.notification.body}`);
+  });
+
+  // -------- UI + APP LOGIC (as before) --------
+  const ui = {
+    auth:        document.getElementById('auth'),
+    onboarding:  document.getElementById('onboarding'),
+    dashboard:   document.getElementById('dashboard'),
+    logger:      document.getElementById('habit-logger'),
+    logout:      document.getElementById('logout'),
+    posStreaks:  document.getElementById('posStreaks'),
+    negStreaks:  document.getElementById('negStreaks'),
+    hiddenNeg:   document.getElementById('hiddenNegative'),
+    showNegBtn:  document.getElementById('showNeg')
+  };
+
+  // Tab switching
+  document.getElementById('tabManual').onclick = () => switchSection('manual');
+  document.getElementById('tabAI').onclick     = () => switchSection('aiChat');
+  function switchSection(id){
+    document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  // Dark mode toggle
+  document.getElementById('toggleTheme').onclick = () => {
+    const root = document.body;
+    const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    root.setAttribute('data-theme', next);
+    document.getElementById('toggleTheme').textContent =
+      next==='dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+  };
+
+  // Auth buttons
+  document.getElementById('btnSignUp').onclick = () =>
+    auth.createUserWithEmailAndPassword(email.value, password.value)
+      .catch(e=>alert(e.message));
+  document.getElementById('btnLogIn').onclick = () =>
+    auth.signInWithEmailAndPassword(email.value, password.value)
+      .catch(e=>alert(e.message));
+  document.getElementById('logout').onclick = () => auth.signOut();
+
+  // On auth change
+  auth.onAuthStateChanged(async user => {
+    if(!user){ showOnly(ui.auth, ui.onboarding); return; }
+    // load profile
+    const doc = await db.collection('profiles').doc(user.uid).get();
+    if(!doc.exists){ showOnly(ui.onboarding); return; }
+    window.profile = doc.data();
+    showOnly(ui.dashboard, ui.logger, ui.logout);
+    setupHabitLogger();
+    renderDashboard();
+  });
+
+  // Onboarding save
+  document.getElementById('btnSaveProfile').onclick = async () => {
+    const u = auth.currentUser;
+    const data = {
+      goals:     goals.value.split(',').map(s=>s.trim()),
+      posHabits: posHabits.value.split(',').map(s=>s.trim()),
+      negHabits: negHabits.value.split(',').map(s=>s.trim()),
+      style:     style.value
+    };
+    await db.collection('profiles').doc(u.uid).set(data);
+    window.profile = data;
+    showOnly(ui.dashboard, ui.logger, ui.logout);
+    setupHabitLogger();
+    renderDashboard();
+  };
+
+  // Habit logger
+  function setupHabitLogger(){
+    const c = document.getElementById('habitButtons');
+    c.innerHTML = '';
+    profile.posHabits.forEach(h=>{
+      const b = document.createElement('button');
+      b.textContent = `✔️ ${h}`;
+      b.onclick = ()=>logHabit(h,'positive');
+      c.appendChild(b);
+    });
+    profile.negHabits.forEach(h=>{
+      const b = document.createElement('button');
+      b.textContent = `⚠️ ${h}`;
+      b.onclick = ()=>logHabit(h,'negative');
+      c.appendChild(b);
+    });
+  }
+  async function logHabit(habit,type){
+    await db.collection('logs').add({
+      uid: auth.currentUser.uid,
+      habit, type,
+      ts: firebase.firestore.Timestamp.now()
+    });
+    renderDashboard();
+  }
+
+  // Dashboard + streaks + chart
+  async function renderDashboard(){
+    const u = auth.currentUser;
+    // today's percentage
+    const start = new Date(); start.setHours(0,0,0,0);
+    const snaps = await db.collection('logs')
+      .where('uid','==',u.uid)
+      .where('ts','>=',firebase.firestore.Timestamp.fromDate(start))
+      .get();
+    const pct = Math.round(snaps.size / profile.posHabits.length * 100);
+    percent.textContent = `${Math.min(100,pct)}%`;
+
+    // 7-day chart
+    const labels =[],data=[];
+    for(let i=6;i>=0;i--){
+      const d=new Date(); d.setDate(d.getDate()-i); d.setHours(0,0,0,0);
+      labels.push(d.toLocaleDateString());
+      const s = await db.collection('logs')
+        .where('uid','==',u.uid)
+        .where('type','==','positive')
+        .where('ts','>=',firebase.firestore.Timestamp.fromDate(d))
+        .where('ts','<',firebase.firestore.Timestamp.fromDate(new Date(d.getTime()+86400000)))
+        .get();
+      data.push(s.size);
+    }
+    renderChart(labels,data);
+
+    // streaks
+    computeStreaks('positive', profile.posHabits, ui.posStreaks, false);
+    computeStreaks('negative', profile.negHabits, ui.negStreaks, true);
+  }
+
+  let chartInstance;
+  function renderChart(labels,data){
+    const ctx = chart.getContext('2d');
+    if(chartInstance) chartInstance.destroy();
+    chartInstance = new Chart(ctx,{
+      type:'line',
+      data:{ labels, datasets:[{ label:'Positive Logs', data, fill:false }]},
+      options:{ responsive:true, scales:{ y:{ beginAtZero:true } } }
+    });
+  }
+
+  async function computeStreaks(type,habits,container,hide){
+    container.innerHTML = '';
+    for(const h of habits){
+      let streak=0,offset=0;
+      while(true){
+        const d=new Date(); d.setDate(d.getDate()-offset); d.setHours(0,0,0,0);
+        const next=new Date(d.getTime()+86400000);
+        const s=await db.collection('logs')
+          .where('uid','==',auth.currentUser.uid)
+          .where('habit','==',h)
+          .where('type','==',type)
+          .where('ts','>=',firebase.firestore.Timestamp.fromDate(d))
+          .where('ts','<',firebase.firestore.Timestamp.fromDate(next))
+          .get();
+        if((type==='positive'&&s.size>0)||(type==='negative'&&s.size===0)){
+          streak++; offset++;
+        } else break;
+      }
+      const b=document.createElement('div');
+      b.className='badge';
+      b.textContent=`${h}: ${streak}d`;
+      container.appendChild(b);
+    }
+    ui.hiddenNeg.style.display = hide? 'none':'block';
+    ui.showNegBtn.style.display = hide? 'block':'none';
+  }
+  showNeg.onclick = ()=>{
+    ui.hiddenNeg.style.display='block';
+    ui.showNegBtn.style.display='none';
+  };
+
+  // Gemini chat
+  let gemKey = localStorage.getItem('geminiKey')||'';
+  saveGeminiKey.onclick = ()=>{
+    gemKey=geminiKey.value.trim();
+    localStorage.setItem('geminiKey',gemKey);
+    alert('Gemini key saved');
+  };
+  btnSend.onclick = async ()=>{
+    const msgText = chatInput.value.trim();
+    if(!msgText||!gemKey) return alert('Enter message & API key');
+    appendChat('You',msgText);
+    chatInput.value='';
+    const res = await fetch(
+      'https://api.generativelanguage.googleapis.com/v1beta2/models/chat-bison-001:generateMessage?key='+gemKey,
+      {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ prompt:{ text:msgText }, model:'chat-bison-001', temperature:0.7, candidateCount:1 })
+      }
+    );
+    const j = await res.json();
+    const reply = j.candidates?.[0]?.content || 'No reply.';
+    appendChat('MentorAI',reply);
+  };
+  function appendChat(who,msg){
+    const d=document.createElement('div');
+    d.innerHTML=`<strong>${who}:</strong> ${msg}`;
+    chatLog.appendChild(d);
+    chatLog.scrollTop=chatLog.scrollHeight;
+  }
+
+  // Helper to show only certain cards
+  function showOnly(...els){
+    [ui.auth,ui.onboarding,ui.dashboard,ui.logger,ui.logout]
+      .forEach(e=> e.style.display = els.includes(e)?'block':'none');
+  }
+</script>
+</body>
+</html>
