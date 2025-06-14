@@ -1,0 +1,116 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Habit Tracker</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 500px; margin: auto; }
+    h1 { text-align: center; }
+    #new-habit { display: flex; margin-bottom: 10px; }
+    #new-habit input { flex: 1; padding: 8px; font-size: 16px; }
+    #new-habit button { padding: 8px 12px; margin-left: 5px; font-size: 16px; }
+    .habit { display: flex; align-items: center; justify-content: space-between; padding: 8px; border-bottom: 1px solid #ddd; }
+    .habit-name { flex: 1; }
+    .stats { font-size: 14px; color: #555; }
+    .badge { margin-left: 8px; }
+  </style>
+</head>
+<body>
+  <h1>Habit Tracker</h1>
+  <div id="new-habit">
+    <input type="text" id="habit-input" placeholder="Add a new habit/task" />
+    <button id="add-btn">Add</button>
+  </div>
+  <div id="habits"></div>  <script>
+    const STORAGE_KEY = 'habits_data';
+    let habits = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+
+    function save() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(habits));
+    }
+
+    function getTodayKey() {
+      const d = new Date();
+      return d.toISOString().slice(0,10);
+    }
+
+    function addHabit(name) {
+      habits.push({ name, logs: {} });
+      save();
+      render();
+    }
+
+    function toggleLog(idx) {
+      const key = getTodayKey();
+      const h = habits[idx];
+      h.logs[key] = !h.logs[key];
+      save();
+      render();
+    }
+
+    function computeStreak(logs) {
+      let count = 0;
+      const today = new Date();
+      while (true) {
+        const key = today.toISOString().slice(0,10);
+        if (logs[key]) { count++; } else { break; }
+        today.setDate(today.getDate() - 1);
+      }
+      return count;
+    }
+
+    function getBadge(streak) {
+      if (streak >= 365) return '🏆';
+      if (streak >= 30) return '🥇';
+      if (streak >= 7) return '🏅';
+      return '';
+    }
+
+    function render() {
+      const container = document.getElementById('habits');
+      container.innerHTML = '';
+      const todayKey = getTodayKey();
+      habits.forEach((h, idx) => {
+        const div = document.createElement('div');
+        div.className = 'habit';
+        const name = document.createElement('div');
+        name.className = 'habit-name';
+        name.textContent = h.name;
+
+        const controls = document.createElement('div');
+        const chk = document.createElement('input');
+        chk.type = 'checkbox';
+        chk.checked = !!h.logs[todayKey];
+        chk.addEventListener('change', () => toggleLog(idx));
+
+        const stats = document.createElement('span');
+        const streak = computeStreak(h.logs);
+        stats.className = 'stats';
+        stats.textContent = `${streak} day${streak===1? '':'s'}`;
+
+        const badge = document.createElement('span');
+        badge.className = 'badge';
+        badge.textContent = getBadge(streak);
+
+        controls.appendChild(chk);
+        controls.appendChild(stats);
+        controls.appendChild(badge);
+        div.appendChild(name);
+        div.appendChild(controls);
+        container.appendChild(div);
+      });
+    }
+
+    document.getElementById('add-btn').addEventListener('click', () => {
+      const input = document.getElementById('habit-input');
+      const name = input.value.trim();
+      if (name) {
+        addHabit(name);
+        input.value = '';
+      }
+    });
+
+    // Initial render
+    render();
+  </script></body>
+</html>
