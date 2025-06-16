@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+
+  <style>
+
+
+
+
+
+
+
+
+
+   
+.container{
+  display: grid;
+  grid-template-rows: 10% 70% 10% 10%;
+  grid-template-columns: 10% 30% 10% 10% 40%;
+  height: 90vh;
+  grid-gap: 2px;
+}
+
+
+
+
+.Header{
+  background-color: blue;
+  grid-column: 1/6;
+}
+.left{
+  background-color: rgb(255, 0, 0);
+}
+
+.main{
+  background-color: rgb(255, 234, 0);
+}
+
+.right{
+  background-color: rgb(0, 255, 64);
+  grid-column: 3/5;
+}
+
+.footer{
+  background-color: rgb(255, 0, 191);
+  /* grid-column: ; */
+} 
+.Header2{
+  background-color: blueviolet;
+  grid-column: 1/4;
+}
+.left2{
+  background-color: rgb(43, 226, 211);
+  grid-column: 4/6;
+}
+.main2{
+  background-color: chartreuse;
+  grid-column: 1/6;
+}
+
+  </style>
+
+</head>
+<body>
+
+
+
+
+<div class="container">
+  <div class="Header">Header</div>
+  <div class="left">left nav</div>
+  <div class="main ">main</div>
+  <div class="right">right</div>
+  <div class="footer">footer</div>
+<div class="Header2">Header</div>
+  <div class="left2">left nav</div>
+  <div class="main2 ">main</div>
+
+</div> 
+
+
+
+</body>
+</html>
