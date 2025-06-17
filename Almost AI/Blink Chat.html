@@ -2,282 +2,236 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Blink Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Enhanced Chat App (No Storage)</title>
   <style>
-    :root {
-      --c1: #FFDCDC;
-      --c2: #FFF2EB;
-      --c3: #FFE8CD;
-      --c4: #FFD6BA;
-    }
-
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: var(--c2);
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-
-    #header {
-      background: var(--c1);
-      padding: 10px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    #header img {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-    }
-
-    #header span {
-      font-weight: bold;
-    }
-
-    #users {
-      background: var(--c4);
-      padding: 10px;
-      overflow-x: auto;
-      white-space: nowrap;
-    }
-
-    #users img {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      margin-right: 5px;
-      vertical-align: middle;
-    }
-
-    #chat {
-      flex: 1;
-      padding: 10px;
-      overflow-y: auto;
-    }
-
-    .msg {
-      max-width: 70%;
-      margin-bottom: 10px;
-      border-radius: 20px;
-      padding: 10px;
-      background: var(--c3);
-      position: relative;
-      word-wrap: break-word;
-      display: inline-block;
-    }
-
-    .msg.me {
-      background: var(--c1);
-      align-self: flex-end;
-      margin-left: auto;
-      text-align: right;
-    }
-
-    .msg.other {
-      background: var(--c3);
-      text-align: left;
-    }
-
-    .msg img {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      position: absolute;
-      left: -40px;
-      top: 5px;
-    }
-
-    .msg .timestamp {
-      display: block;
-      font-size: 10px;
-      color: gray;
-      margin-bottom: 5px;
-    }
-
-    #form {
-      display: flex;
-      padding: 10px;
-      background: var(--c1);
-    }
-
-    #msgInput {
-      flex: 1;
-      padding: 10px;
-      border: none;
-      border-radius: 20px;
-      outline: none;
-    }
-
-    #sendBtn {
-      width: 45px;
-      height: 45px;
-      margin-left: 10px;
-      border-radius: 50%;
-      background: var(--c4);
-      border: none;
-      font-size: 20px;
-    }
-
-    #authOverlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: var(--c2);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-
-    #authOverlay input {
-      padding: 10px;
-      width: 80%;
-      border-radius: 10px;
-      border: 1px solid #ccc;
-    }
-
-    #authOverlay button {
-      padding: 10px 20px;
-      border: none;
-      background: var(--c4);
-      border-radius: 10px;
-    }
-
+    /* Palette:
+       #FFF2EB Light Peach, #FFDCDC Soft Pink,
+       #FFE8CD Warm Cream, #FFD6BA Blush Tan
+    */
+    #app { display:flex; flex-direction:column; height:100vh; margin:0; background:#FFF2EB; font-family:sans-serif; }
+    /* Login view */
+    #loginView { flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:16px; background:#FFDCDC; }
+    #loginView input, #loginView button { width:100%; max-width:360px; padding:12px; margin:8px 0; font-size:1em; border:none; border-radius:4px; background:#FFF2EB; }
+    /* Chat view */
+    #chatView { flex:1; display:none; flex-direction:column; padding:16px; background:#FFE8CD; }
+    /* Header */
+    #topBar { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; padding:8px; background:#FFD6BA; border-radius:4px; }
+    #topBar img { width:32px; height:32px; border-radius:50%; margin-right:8px; }
+    #userName { font-weight:bold; color:#333; display:flex; align-items:center; }
+    #logoutBtn { padding:8px 12px; border:none; background:#FFDCDC; border-radius:4px; cursor:pointer; }
+    /* Online users */
+    #userList { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:8px; padding:0; list-style:none; }
+    #userList li { background:#FFE8CD; padding:6px 10px; border-radius:4px; font-size:0.9em; }
+    /* Chat box */
+    #chatBox { flex:1; display:flex; flex-direction:column; background:#FFD6BA; border-radius:8px; overflow:hidden; }
+    #msgArea { flex:1; display:flex; flex-direction:column; gap:8px; padding:10px; overflow-y:auto; background:#FFF2EB; }
+    .message { display:flex; flex-direction:column; max-width:70%; padding:8px; background:#FFE8CD; border-radius:16px; }
+    .message.other { align-self:flex-start; border-top-left-radius:4px; }
+    .message.self { align-self:flex-end; background:#FFDCDC; border-top-right-radius:4px; }
+    .timeTag { font-size:0.75em; color:#555; margin-bottom:4px; }
+    .msgContent { word-wrap:break-word; }
+    .avatar { width:24px; height:24px; border-radius:50%; margin-bottom:4px; }
+    /* Input bar */
+    #inputBar { display:flex; align-items:center; padding:8px; background:#FFDCDC; }
+    #msgInput { flex:1; padding:10px; font-size:1em; border:none; border-radius:4px; margin-right:4px; background:#FFF2EB; }
+    #sendBtn { width:40px; height:40px; border:none; border-radius:50%; background:#FFE8CD; display:flex; align-items:center; justify-content:center; font-size:1.2em; cursor:pointer; }
+    /* Clear chat */
+    #clearBtn { margin-top:8px; max-width:360px; padding:12px; border:none; border-radius:4px; background:#FFD6BA; color:#333; cursor:pointer; }
   </style>
 </head>
 <body>
-  <div id="authOverlay">
-    <input type="text" id="username" placeholder="Enter your name" />
-    <input type="file" id="photoUpload" accept="image/*" />
-    <button onclick="startChat()">Start Chat</button>
+  <div id="app">
+    <!-- Login View -->
+    <div id="loginView">
+      <h2>Sign In</h2>
+      <input id="email" type="email" placeholder="Email (leave blank for guest)" />
+      <input id="password" type="password" placeholder="Password (leave blank for guest)" />
+      <input id="picInput" type="file" accept="image/*" />
+      <button id="loginBtn">Log In / Register</button>
+      <button id="guestBtn">Continue as Guest</button>
+    </div>
+    <!-- Chat View -->
+    <div id="chatView">
+      <div id="topBar">
+        <div id="userName">
+          <img id="userPic" src="https://via.placeholder.com/32" alt="avatar">
+          <span id="userTxt"></span>
+        </div>
+        <button id="logoutBtn">Logout</button>
+      </div>
+      <ul id="userList"></ul>
+      <div id="chatBox">
+        <div id="msgArea"></div>
+        <div id="inputBar">
+          <input id="msgInput" placeholder="Type a message…" autocomplete="off" />
+          <button id="sendBtn">✈️</button>
+        </div>
+      </div>
+      <button id="clearBtn">Clear Chat</button>
+    </div>
   </div>
 
-  <div id="header" style="display:none;">
-    <img id="myPic" src="" />
-    <span id="myName"></span>
-  </div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import {
+      getDatabase, ref, push, onChildAdded,
+      onValue, set, onDisconnect, remove
+    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+    import {
+      getAuth, signInWithEmailAndPassword,
+      createUserWithEmailAndPassword, signInAnonymously,
+      onAuthStateChanged, signOut, updateProfile
+    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-  <div id="users"></div>
-
-  <div id="chat"></div>
-
-  <form id="form" onsubmit="return sendMsg();">
-    <input id="msgInput" autocomplete="off" placeholder="Type a message..." />
-    <button id="sendBtn">🛫</button>
-  </form>
-
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-
-  <script>
-    const firebaseConfig = {
+    // Initialize Firebase – replace with your actual key!
+    const cfg = {
       apiKey: "AIzaSyAYA5pjoxFuxH2Kzo_eDSqTZPDkYXOZU8s",
       authDomain: "blink-chat-hd.firebaseapp.com",
       databaseURL: "https://blink-chat-hd-default-rtdb.firebaseio.com",
       projectId: "blink-chat-hd"
     };
+    const app = initializeApp(cfg),
+          db  = getDatabase(app),
+          auth = getAuth(app);
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.database();
+    // UI refs
+    const loginV  = document.getElementById('loginView'),
+          chatV   = document.getElementById('chatView'),
+          emailEl = document.getElementById('email'),
+          passEl  = document.getElementById('password'),
+          picEl   = document.getElementById('picInput'),
+          loginBtn= document.getElementById('loginBtn'),
+          guestBtn= document.getElementById('guestBtn'),
+          logoutBtn=document.getElementById('logoutBtn'),
+          userPicEl=document.getElementById('userPic'),
+          userTxtEl=document.getElementById('userTxt'),
+          userList=document.getElementById('userList'),
+          msgArea = document.getElementById('msgArea'),
+          msgInput= document.getElementById('msgInput'),
+          sendBtn = document.getElementById('sendBtn'),
+          clearBtn= document.getElementById('clearBtn');
 
-    let currentUser = {};
-    let currentPhoto = "";
+    let currentPhotoURL = '';
 
-    function startChat() {
-      const name = document.getElementById("username").value.trim();
-      const file = document.getElementById("photoUpload").files[0];
+    // Read image as DataURL
+    picEl.addEventListener('change', () => {
+      const file = picEl.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        currentPhotoURL = reader.result;
+        userPicEl.src = currentPhotoURL;
+      };
+      reader.readAsDataURL(file);
+    });
 
-      if (!name) {
-        alert("Enter name");
-        return;
+    // Email/password login
+    loginBtn.onclick = async () => {
+      const email = emailEl.value.trim(),
+            pass  = passEl.value.trim();
+      if (!email || !pass) return alert('Provide email/password or use Guest');
+      try {
+        await signInWithEmailAndPassword(auth, email, pass);
+      } catch (e) {
+        if (e.code === 'auth/user-not-found') {
+          await createUserWithEmailAndPassword(auth, email, pass);
+        } else {
+          alert(e.message);
+        }
       }
+    };
 
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          currentPhoto = e.target.result;
-          authUser(name, currentPhoto);
-        };
-        reader.readAsDataURL(file);
+    // Anonymous guest
+    guestBtn.onclick = () => signInAnonymously(auth).catch(e => alert(e.message));
+    logoutBtn.onclick = () => signOut(auth);
+
+    onAuthStateChanged(auth, async user => {
+      if (user) {
+        loginV.style.display = 'none';
+        chatV.style.display  = 'flex';
+
+        // Prompt for name if missing
+        if (!user.displayName) {
+          const name = prompt('Enter your name:', 'Guest');
+          await updateProfile(user, { displayName: name || 'Guest' });
+        }
+        initUser(user);
       } else {
-        authUser(name, "");
+        loginV.style.display = 'flex';
+        chatV.style.display  = 'none';
+        userList.innerHTML = '';
+        msgArea.innerHTML  = '';
       }
-    }
+    });
 
-    function authUser(name, photo) {
-      auth.signInAnonymously().then(() => {
-        const uid = auth.currentUser.uid;
-        currentUser = { uid, name, photo };
+    function initUser(user) {
+      userTxtEl.textContent = user.displayName;
+      userPicEl.src = currentPhotoURL || 'https://via.placeholder.com/32';
 
-        db.ref("presence/" + uid).set({ name, photo, online: true });
-        db.ref("presence/" + uid).onDisconnect().remove();
+      // Presence
+      const presRef = ref(db, `presence/${user.uid}`);
+      set(presRef, { name: user.displayName, online: true, photoURL: currentPhotoURL });
+      onDisconnect(presRef).set({ name: user.displayName, online: false });
 
-        document.getElementById("authOverlay").style.display = "none";
-        document.getElementById("header").style.display = "flex";
-        document.getElementById("myName").innerText = name;
-        if (photo) document.getElementById("myPic").src = photo;
-
-        listenForUsers();
-        listenForMessages();
-      });
-    }
-
-    function listenForUsers() {
-      db.ref("presence").on("value", (snap) => {
-        const usersDiv = document.getElementById("users");
-        usersDiv.innerHTML = "";
-        snap.forEach((child) => {
-          const data = child.val();
-          const img = `<img src="${data.photo || ''}" title="${data.name}" />`;
-          usersDiv.innerHTML += img;
+      // Online users
+      onValue(ref(db, 'presence'), snap => {
+        userList.innerHTML = '';
+        snap.forEach(c => {
+          const v = c.val();
+          if (v.online) {
+            const li = document.createElement('li');
+            li.textContent = v.name;
+            userList.append(li);
+          }
         });
       });
-    }
 
-    function listenForMessages() {
-      db.ref("messages").limitToLast(100).on("child_added", (snap) => {
-        const data = snap.val();
-        const div = document.createElement("div");
-        div.className = "msg " + (data.uid === currentUser.uid ? "me" : "other");
+      // Messages
+      onChildAdded(ref(db, 'chats'), snap => {
+        const { text, ts, sender, photoURL } = snap.val();
+        const div = document.createElement('div');
+        const me  = sender === auth.currentUser.displayName;
+        div.className = 'message ' + (me ? 'self' : 'other');
 
-        const ts = new Date(data.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        const avatar = data.uid !== currentUser.uid && data.photo
-          ? `<img src="${data.photo}" />` : "";
+        const avatarHTML = !me
+          ? `<img src="${photoURL || 'https://via.placeholder.com/24'}" class="avatar">`
+          : '';
 
-        div.innerHTML = `
-          ${avatar}
-          <span class="timestamp">${ts}</span><br>
-          ${data.text}
-        `;
+        div.innerHTML =
+          `<div class="timeTag">${new Date(ts).toLocaleTimeString()}</div>` +
+          avatarHTML +
+          `<div class="msgContent">${text}</div>`;
 
-        document.getElementById("chat").appendChild(div);
-        document.getElementById("chat").scrollTop = chat.scrollHeight;
+        msgArea.append(div);
+        msgArea.scrollTop = msgArea.scrollHeight;
       });
     }
 
-    function sendMsg() {
-      const msg = document.getElementById("msgInput").value.trim();
-      if (!msg) return false;
-
-      db.ref("messages").push({
-        text: msg,
-        uid: currentUser.uid,
-        name: currentUser.name,
-        photo: currentUser.photo,
-        time: Date.now()
+    // Send
+    sendBtn.onclick = () => {
+      const txt = msgInput.value.trim();
+      if (!txt) return;
+      push(ref(db, 'chats'), {
+        text: txt,
+        ts:   Date.now(),
+        sender: auth.currentUser.displayName,
+        photoURL: currentPhotoURL
       });
+      msgInput.value = '';
+    };
 
-      document.getElementById("msgInput").value = "";
-      return false;
-    }
+    // Clear
+    clearBtn.onclick = () => {
+      if (confirm('Clear chat?')) {
+        remove(ref(db, 'chats')).then(() => msgArea.innerHTML = '');
+      }
+    };
+
+    // Enter ➔ send
+    msgInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') sendBtn.click();
+    });
   </script>
 </body>
 </html>
