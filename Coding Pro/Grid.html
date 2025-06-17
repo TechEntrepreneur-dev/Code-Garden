@@ -1,10 +1,31 @@
 <style>
-  
+  .Container>div {
+    display: grid;
+    grid-template-rows: 10px 40px 40px 10px;
+    grid-template-columns: 25px 25px 25px 25px;
+  }
+  .Header {
+    background-color: Green;
+    grid-row-start: 1;
+    grid-row-end: 1;
+    grid-column-start: 1;
+    grid-column-end: 4;
+  }
+  .Left-Bar {
+    background-color: #2d4deef4;
+    grid-row: ;
+  }
+  .Right-Bar {
+    background-color: yellow;
+  }
+  .Footer {
+    background-color: Red;
+  }
 </style>
 
 <div class="Container">
   <div class="Header">Header</div>
-  <div class="Left Bar">Left Menu</div>
-  <div class="Right Bar">Right Menu</div>
+  <div class="Left-Bar">Left Menu</div>
+  <div class="Right-Bar">Right Menu</div>
   <div class="Footer">Footer</div>
 </div>
