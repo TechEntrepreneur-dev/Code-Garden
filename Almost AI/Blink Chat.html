@@ -2,7 +2,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Enhanced Chat App</title>
+  <title>Enhanced Chat App (No Storage)</title>
   <style>
     /* Palette:
        #FFF2EB Light Peach, #FFDCDC Soft Pink,
@@ -53,7 +53,7 @@
     <!-- Chat View -->
     <div id="chatView">
       <div id="topBar">
-        <div id="userName"><img id="userPic" src="" alt="avatar"><span id="userTxt"></span></div>
+        <div id="userName"><img id="userPic" src="https://via.placeholder.com/32" alt="avatar"><span id="userTxt"></span></div>
         <button id="logoutBtn">Logout</button>
       </div>
       <ul id="userList"></ul>
@@ -70,67 +70,88 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
     import { getDatabase, ref, push, onChildAdded, onValue, set, onDisconnect, remove } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
     import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-    import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
 
-    const cfg={apiKey:"AIzaSyAYA5pjoxFuxH2Kzo_eDSqTZPDkYXOZU8s",authDomain:"blink-chat-hd.firebaseapp.com",databaseURL:"https://blink-chat-hd-default-rtdb.firebaseio.com",projectId:"blink-chat-hd",storageBucket:"blink-chat-hd.appspot.com",messagingSenderId:"712857952183",appId:"1:712857952183:web:47a623b806093d3f021232"};
-    const app=initializeApp(cfg), db=getDatabase(app), auth=getAuth(app), storage=getStorage(app);
+    // Initialize Firebase
+    const cfg = { apiKey: "AIzaSy...", authDomain: "blink-chat-hd.firebaseapp.com", databaseURL: "https://blink-chat-hd-default-rtdb.firebaseio.com", projectId: "blink-chat-hd" };
+    const app = initializeApp(cfg), db = getDatabase(app), auth = getAuth(app);
 
     // UI refs
-    const loginV=document.getElementById('loginView'), chatV=document.getElementById('chatView');
-    const emailEl=document.getElementById('email'), passEl=document.getElementById('password'), picInput=document.getElementById('picInput');
-    const loginBtn=document.getElementById('loginBtn'), guestBtn=document.getElementById('guestBtn'), logoutBtn=document.getElementById('logoutBtn');
-    const userPicEl=document.getElementById('userPic'), userTxtEl=document.getElementById('userTxt');
-    const userList=document.getElementById('userList'), msgArea=document.getElementById('msgArea');
-    const msgInput=document.getElementById('msgInput'), sendBtn=document.getElementById('sendBtn'), clearBtn=document.getElementById('clearBtn');
+    const loginV = document.getElementById('loginView'), chatV = document.getElementById('chatView');
+    const emailEl = document.getElementById('email'), passEl = document.getElementById('password'), picInput = document.getElementById('picInput');
+    const loginBtn = document.getElementById('loginBtn'), guestBtn = document.getElementById('guestBtn'), logoutBtn = document.getElementById('logoutBtn');
+    const userPicEl = document.getElementById('userPic'), userTxtEl = document.getElementById('userTxt');
+    const userList = document.getElementById('userList'), msgArea = document.getElementById('msgArea');
+    const msgInput = document.getElementById('msgInput'), sendBtn = document.getElementById('sendBtn'), clearBtn = document.getElementById('clearBtn');
 
-    // Auth flows
-    loginBtn.onclick=async()=>{
-      const email=emailEl.value.trim(), pass=passEl.value.trim();
-      if(!email||!pass)return alert('Provide email & password or use Guest.');
-      try{await signInWithEmailAndPassword(auth,email,pass);}catch(e){if(e.code==='auth/user-not-found')createUserWithEmailAndPassword(auth,email,pass);else alert(e.message);}  
-    };
-    guestBtn.onclick=()=>signInAnonymously(auth).catch(e=>alert(e.message));
-    logoutBtn.onclick=()=>signOut(auth);
+    let currentPhotoURL = ''; // will hold data URL
 
-    onAuthStateChanged(auth, async user=>{
-      if(user){
-        loginV.style.display='none'; chatV.style.display='flex';
-        // upload pic if chosen
-        let photoURL='';
-        if(picInput.files.length){
-          const file=picInput.files[0];
-          const storageRef=sRef(storage, `avatars/${user.uid}`);
-          await uploadBytes(storageRef,file);
-          photoURL=await getDownloadURL(storageRef);
-          await updateProfile(user,{photoURL});
-        }
-        // displayName prompt
-        if(!user.displayName){const name=prompt('Enter name:',user.photoURL?'':'Guest');await updateProfile(user,{displayName:name||'Guest'});}        
-        initUser(user);
-      } else {loginV.style.display='flex'; chatV.style.display='none'; msgArea.innerHTML=''; userList.innerHTML='';}
+    // Read image as DataURL and store in Realtime DB
+    picInput.addEventListener('change', () => {
+      const file = picInput.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        currentPhotoURL = reader.result;
+        userPicEl.src = currentPhotoURL;
+      };
+      reader.readAsDataURL(file);
     });
 
-    function initUser(user){
-      userTxtEl.textContent=user.displayName;
-      userPicEl.src=user.photoURL||'https://via.placeholder.com/32';
+    // Auth
+    loginBtn.onclick = async () => {
+      const email = emailEl.value.trim(), pass = passEl.value.trim();
+      if (!email || !pass) return alert('Provide email/password or use Guest');
+      try { await signInWithEmailAndPassword(auth, email, pass); }
+      catch(e) { if (e.code==='auth/user-not-found') createUserWithEmailAndPassword(auth,email,pass); else alert(e.message); }
+    };
+    guestBtn.onclick = () => signInAnonymously(auth).catch(e=>alert(e.message));
+    logoutBtn.onclick = () => signOut(auth);
+
+    onAuthStateChanged(auth, async user => {
+      if (user) {
+        loginV.style.display='none'; chatV.style.display='flex';
+        // prompt displayName
+        if (!user.displayName) {
+          const name = prompt('Enter name:', 'Guest');
+          await updateProfile(user, { displayName: name||'Guest' });
+        }
+        initUser(user);
+      } else {
+        loginV.style.display='flex'; chatV.style.display='none'; userList.innerHTML=''; msgArea.innerHTML='';
+      }
+    });
+
+    function initUser(user) {
+      userTxtEl.textContent = user.displayName;
       // presence
-      const presRef=ref(db,`presence/${user.uid}`);set(presRef,{name:user.displayName,online:true});onDisconnect(presRef).set({name:user.displayName,online:false});
+      const presRef = ref(db, `presence/${user.uid}`);
+      set(presRef, { name: user.displayName, online: true, photoURL: currentPhotoURL });
+      onDisconnect(presRef).set({ name: user.displayName, online: false });
       // online users
-      onValue(ref(db,'presence'),snap=>{userList.innerHTML='';snap.forEach(c=>{if(c.val().online){const li=document.createElement('li');li.textContent=c.val().name;userList.append(li);}});
+      onValue(ref(db,'presence'), snap => {
+        userList.innerHTML='';
+        snap.forEach(c => { const v=c.val(); if(v.online){ const li=document.createElement('li'); li.textContent=v.name; userList.append(li);} });
       });
       // messages
-      onChildAdded(ref(db,'chats'),snap=>{
-        const {text,ts,sender,photoURL}=snap.val();
-        const div=document.createElement('div');div.className='message '+(sender===auth.currentUser.displayName?'self':'other');
-        const imgHTML=sender!==auth.currentUser.displayName?`<img src="${photoURL||'https://via.placeholder.com/24'}" class="avatar">`:'';
-        div.innerHTML=`<div class="timeTag">${new Date(ts).toLocaleTimeString()}</div>${imgHTML}<div class="msgContent">${text}</div>`;
-        msgArea.append(div);msgArea.scrollTop=msgArea.scrollHeight;
+      onChildAdded(ref(db,'chats'), snap => {
+        const { text, ts, sender, photoURL } = snap.val();
+        const div = document.createElement('div');
+        const isSelf = sender === auth.currentUser.displayName;
+        div.className = 'message ' + (isSelf ? 'self' : 'other');
+        const avatarImg = !isSelf ? `<img src="${photoURL||'https://via.placeholder.com/24'}" class="avatar">` : '';
+        div.innerHTML = `<div class="timeTag">${new Date(ts).toLocaleTimeString()}</div>${avatarImg}<div class="msgContent">${text}</div>`;
+        msgArea.append(div); msgArea.scrollTop = msgArea.scrollHeight;
       });
     }
 
     // send
-    sendBtn.onclick=()=>{const t=msgInput.value.trim();if(!t)return;push(ref(db,'chats'),{text:t,ts:Date.now(),sender:auth.currentUser.displayName,photoURL:auth.currentUser.photoURL});msgInput.value='';};
-    clearBtn.onclick=()=>{if(confirm('Clear chat history?'))remove(ref(db,'chats')).then(()=>msgArea.innerHTML='');};
-    msgInput.addEventListener('keydown',e=>{if(e.key==='Enter')sendBtn.click();});
+    sendBtn.onclick = () => {
+      const txt = msgInput.value.trim(); if(!txt) return;
+      push(ref(db,'chats'), { text: txt, ts: Date.now(), sender: auth.currentUser.displayName, photoURL: currentPhotoURL });
+      msgInput.value='';
+    };
+    // clear
+    clearBtn.onclick = () => { if(confirm('Clear chat?')) remove(ref(db,'chats')).then(()=>msgArea.innerHTML=''); };
+    msgInput.addEventListener('keydown', e => { if(e.key==='Enter') sendBtn.click(); });
   </script></body>
 </html>
