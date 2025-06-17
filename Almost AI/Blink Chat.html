@@ -10,10 +10,7 @@
        - Warm Cream:  #FFE8CD
        - Blush Tan:   #FFD6BA
     */
-    /* --------------------------------------------- */
-    /* #app (root container)
-       - Uses Light Peach background for overall app
-    */
+    /* Root container */
     #app {
       display: flex;
       flex-direction: column;
@@ -21,196 +18,138 @@
       margin: 0;
       font-family: sans-serif;
       background: #FFF2EB;
-    }/* --------------------------------------------- */
-/* #loginView (login screen)
-   - Soft Pink background to highlight login section
-*/
-#loginView {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 16px;
-  background: #FFDCDC;
-}
-
-/* --------------------------------------------- */
-/* #chatView (main chat interface)
-   - Warm Cream background for the chat container
-*/
-#chatView {
-  flex: 1;
-  display: none;
-  flex-direction: column;
-  padding: 16px;
-  background: #FFE8CD;
-}
-
-/* --------------------------------------------- */
-/* #topBar (header bar)
-   - Blush Tan background for header contrast
-*/
-#topBar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-  background: #FFD6BA;
-  padding: 8px;
-  border-radius: 4px;
-}
-
-/* --------------------------------------------- */
-/* #userName (username text)
-   - Darker text on Blush Tan header
-*/
-#userName { font-weight: bold; color: #333; }
-
-/* --------------------------------------------- */
-/* #logoutBtn (logout button)
-   - Soft Pink background on header
-*/
-#logoutBtn {
-  padding: 8px 12px;
-  border: none;
-  background: #FFDCDC;
-  cursor: pointer;
-  border-radius: 4px;
-}
-
-/* --------------------------------------------- */
-/* #userList (online users list)
-   - Transparent on chatView, items highlighted
-*/
-#userList {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 8px;
-  padding: 0;
-  list-style: none;
-}
-/* #userList li (online user badges)
-   - Warm Cream background for badges
-*/
-#userList li {
-  background: #FFE8CD;
-  padding: 6px 10px;
-  border-radius: 4px;
-  font-size: 0.9em;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-/* --------------------------------------------- */
-/* #chatBox (messages container)
-   - Blush Tan for the chat panel background
-*/
-#chatBox {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  background: #FFD6BA;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-/* --------------------------------------------- */
-/* #msgArea (scrollable message area)
-   - Light Peach background for messages area
-*/
-#msgArea {
-  flex: 1;
-  padding: 10px;
-  overflow-y: auto;
-  background: #FFF2EB;
-}
-/* .message (individual message)
-   - Margin for spacing messages
-*/
-.message { margin-bottom: 6px; }
-/* .timeTag (timestamp)
-   - Subtle text color
-*/
-.timeTag {
-  color: #555;
-  font-size: 0.75em;
-  margin-right: 5px;
-}
-
-/* --------------------------------------------- */
-/* #inputBar (message input bar)
-   - Soft Pink background for input controls
-*/
-#inputBar {
-  display: flex;
-  align-items: center;
-  padding: 8px;
-  background: #FFDCDC;
-}
-/* #msgInput (text input)
-   - White input with rounded corners
-*/
-#msgInput {
-  flex: 1;
-  padding: 10px;
-  font-size: 1em;
-  border: none;
-  border-radius: 4px;
-  margin-right: 4px;
-  outline: none;
-  background: #FFF2EB;
-}
-/* #sendBtn (send message button)
-   - Warm Cream button for send action
-*/
-#sendBtn {
-  width: 40px;
-  height: 40px;
-  border: none;
-  border-radius: 50%;
-  background: #FFE8CD;
-  color: #333;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2em;
-  cursor: pointer;
-}
-
-/* --------------------------------------------- */
-/* #clearBtn (clear chat button)
-   - Blush Tan background for prominence
-*/
-#clearBtn {
-  margin-top: 8px;
-  max-width: 360px;
-  padding: 12px;
-  border: none;
-  border-radius: 4px;
-  background: #FFD6BA;
-  color: #333;
-  cursor: pointer;
-}
-
-/* --------------------------------------------- */
-/* Login Inputs & Buttons
-   - Chat neutral styling for login controls
-*/
-#loginView input,
-#loginView button {
-  width: 100%;
-  max-width: 360px;
-  padding: 12px;
-  margin: 8px 0;
-  font-size: 1em;
-  box-sizing: border-box;
-  background: #FFF2EB;
-  border: none;
-  border-radius: 4px;
-}
-
+    }
+    /* Login screen */
+    #loginView {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+      background: #FFDCDC;
+    }
+    /* Chat interface */
+    #chatView {
+      flex: 1;
+      display: none;
+      flex-direction: column;
+      padding: 16px;
+      background: #FFE8CD;
+    }
+    /* Header bar */
+    #topBar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      background: #FFD6BA;
+      padding: 8px;
+      border-radius: 4px;
+    }
+    /* Username text */
+    #userName { font-weight: bold; color: #333; }
+    /* Logout button */
+    #logoutBtn {
+      padding: 8px 12px;
+      border: none;
+      background: #FFDCDC;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    /* Online users list */
+    #userList {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 8px;
+      padding: 0;
+      list-style: none;
+    }
+    #userList li {
+      background: #FFE8CD;
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    /* Chat box container */
+    #chatBox {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #FFD6BA;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    /* Message area */
+    #msgArea {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      background: #FFF2EB;
+    }
+    .message { margin-bottom: 6px; }
+    .timeTag {
+      color: #555;
+      font-size: 0.75em;
+      margin-right: 5px;
+    }
+    /* Input bar */
+    #inputBar {
+      display: flex;
+      align-items: center;
+      padding: 8px;
+      background: #FFDCDC;
+    }
+    #msgInput {
+      flex: 1;
+      padding: 10px;
+      font-size: 1em;
+      border: none;
+      border-radius: 4px;
+      margin-right: 4px;
+      outline: none;
+      background: #FFF2EB;
+    }
+    #sendBtn {
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 50%;
+      background: #FFE8CD;
+      color: #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2em;
+      cursor: pointer;
+    }
+    /* Clear chat button */
+    #clearBtn {
+      margin-top: 8px;
+      max-width: 360px;
+      padding: 12px;
+      border: none;
+      border-radius: 4px;
+      background: #FFD6BA;
+      color: #333;
+      cursor: pointer;
+    }
+    /* Login inputs/buttons */
+    #loginView input,
+    #loginView button {
+      width: 100%;
+      max-width: 360px;
+      padding: 12px;
+      margin: 8px 0;
+      font-size: 1em;
+      box-sizing: border-box;
+      background: #FFF2EB;
+      border: none;
+      border-radius: 4px;
+    }
   </style>
 </head>
 <body>
@@ -239,7 +178,117 @@
       </div>
       <button id="clearBtn">Clear Chat</button>
     </div>
-  </div>  <!-- JS logic unchanged -->  <script type="module">
-    /* … existing JS code … */
+  </div>  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getDatabase, ref, push, onChildAdded, onValue, set, onDisconnect, remove } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+
+    // Firebase config
+    const cfg = {
+      apiKey: "AIzaSyAYA5pjoxFuxH2Kzo_eDSqTZPDkYXOZU8s",
+      authDomain: "blink-chat-hd.firebaseapp.com",
+      databaseURL: "https://blink-chat-hd-default-rtdb.firebaseio.com",
+      projectId: "blink-chat-hd",
+      storageBucket: "blink-chat-hd.appspot.com",
+      messagingSenderId: "712857952183",
+      appId: "1:712857952183:web:47a623b806093d3f021232",
+      measurementId: "G-T9TWHCT6KP"
+    };
+    const app = initializeApp(cfg), db = getDatabase(app), auth = getAuth(app);
+
+    // UI references
+    const loginView = document.getElementById('loginView');
+    const chatView  = document.getElementById('chatView');
+    const emailEl   = document.getElementById('email');
+    const passEl    = document.getElementById('password');
+    const loginBtn  = document.getElementById('loginBtn');
+    const guestBtn  = document.getElementById('guestBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const userName  = document.getElementById('userName');
+    const userList  = document.getElementById('userList');
+    const msgArea   = document.getElementById('msgArea');
+    const msgInput  = document.getElementById('msgInput');
+    const sendBtn   = document.getElementById('sendBtn');
+    const clearBtn  = document.getElementById('clearBtn');
+
+    // Login / Register
+    loginBtn.onclick = () => {
+      const email = emailEl.value.trim(), pass = passEl.value.trim();
+      if (!email || !pass) return alert('Provide email & password or use Guest.');
+      signInWithEmailAndPassword(auth, email, pass)
+        .catch(err => {
+          if (err.code === 'auth/user-not-found') createUserWithEmailAndPassword(auth, email, pass);
+          else alert(err.message);
+        });
+    };
+    // Anonymous guest
+    guestBtn.onclick = () => signInAnonymously(auth).catch(e => alert(e.message));
+    logoutBtn.onclick= () => signOut(auth);
+
+    // Auth state
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        loginView.style.display = 'none';
+        chatView.style.display  = 'flex';
+        if (!user.displayName) {
+          const name = prompt('Enter your name:', 'Guest');
+          updateProfile(user, { displayName: name || 'Guest' }).then(() => initUser(user));
+        } else initUser(user);
+      } else {
+        loginView.style.display = 'flex';
+        chatView.style.display  = 'none';
+        msgArea.innerHTML = '';
+        userList.innerHTML = '';
+      }
+    });
+
+    // Initialize user presence and listeners
+    function initUser(user) {
+      userName.textContent = user.displayName;
+      const presRef = ref(db, `presence/${user.uid}`);
+      set(presRef, { name: user.displayName, online: true });
+      onDisconnect(presRef).set({ name: user.displayName, online: false });
+
+      // Online users
+      onValue(ref(db, 'presence'), snap => {
+        userList.innerHTML = '';
+        snap.forEach(child => {
+          const { name, online } = child.val();
+          if (online) {
+            const li = document.createElement('li');
+            li.textContent = name;
+            userList.append(li);
+          }
+        });
+      });
+
+      // Incoming messages
+      onChildAdded(ref(db, 'chats'), snap => {
+        const { text, ts, sender } = snap.val();
+        const div = document.createElement('div');
+        div.className = 'message';
+        div.innerHTML = `<span class="timeTag">[${new Date(ts).toLocaleTimeString()}]</span><strong>${sender}:</strong> ${text}`;
+        msgArea.append(div);
+        msgArea.scrollTop = msgArea.scrollHeight;
+      });
+    }
+
+    // Send message
+    sendBtn.onclick = () => {
+      const txt = msgInput.value.trim();
+      if (!txt) return;
+      push(ref(db, 'chats'), { text: txt, ts: Date.now(), sender: auth.currentUser.displayName });
+      msgInput.value = '';
+    };
+
+    // Clear chat
+    clearBtn.onclick = () => {
+      if (confirm('Clear chat history?')) {
+        remove(ref(db, 'chats')).then(() => msgArea.innerHTML = '');
+      }
+    };
+
+    // Enter key sends
+    msgInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendBtn.click(); });
   </script></body>
 </html>
