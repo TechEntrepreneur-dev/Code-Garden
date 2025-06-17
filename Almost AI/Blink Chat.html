@@ -4,9 +4,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Responsive Chat App</title>
   <style>
+    /* Color Palette:
+       - Light Peach:  #FFF2EB
+       - Soft Pink:   #FFDCDC
+       - Warm Cream:  #FFE8CD
+       - Blush Tan:   #FFD6BA
+    */
     /* --------------------------------------------- */
-    /* #app
-       - The root container holding both Login and Chat views.
+    /* #app (root container)
+       - Uses Light Peach background for overall app
     */
     #app {
       display: flex;
@@ -14,10 +20,10 @@
       height: 100vh;
       margin: 0;
       font-family: sans-serif;
-      background: #f0f0f0;
+      background: #FFF2EB;
     }/* --------------------------------------------- */
-/* #loginView
-   - The login screen: inputs for email/password and guest button.
+/* #loginView (login screen)
+   - Soft Pink background to highlight login section
 */
 #loginView {
   flex: 1;
@@ -26,50 +32,56 @@
   justify-content: center;
   align-items: center;
   padding: 16px;
+  background: #FFDCDC;
 }
 
 /* --------------------------------------------- */
-/* #chatView
-   - The main chat interface, hidden until user is authenticated.
+/* #chatView (main chat interface)
+   - Warm Cream background for the chat container
 */
 #chatView {
   flex: 1;
   display: none;
   flex-direction: column;
   padding: 16px;
+  background: #FFE8CD;
 }
 
 /* --------------------------------------------- */
-/* #topBar
-   - The top header bar inside chatView, shows username and logout.
+/* #topBar (header bar)
+   - Blush Tan background for header contrast
 */
 #topBar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
+  background: #FFD6BA;
+  padding: 8px;
+  border-radius: 4px;
 }
 
 /* --------------------------------------------- */
-/* #userName
-   - The <strong> element displaying the current user's name.
+/* #userName (username text)
+   - Darker text on Blush Tan header
 */
-#userName { font-weight: bold; }
+#userName { font-weight: bold; color: #333; }
 
 /* --------------------------------------------- */
-/* #logoutBtn
-   - The button to log out and return to loginView.
+/* #logoutBtn (logout button)
+   - Soft Pink background on header
 */
 #logoutBtn {
   padding: 8px 12px;
   border: none;
-  background: #ccc;
+  background: #FFDCDC;
   cursor: pointer;
+  border-radius: 4px;
 }
 
 /* --------------------------------------------- */
-/* #userList
-   - The horizontal list of currently online users.
+/* #userList (online users list)
+   - Transparent on chatView, items highlighted
 */
 #userList {
   display: flex;
@@ -79,11 +91,11 @@
   padding: 0;
   list-style: none;
 }
-/* #userList li
-   - Each individual online user badge.
+/* #userList li (online user badges)
+   - Warm Cream background for badges
 */
 #userList li {
-  background: #fff;
+  background: #FFE8CD;
   padding: 6px 10px;
   border-radius: 4px;
   font-size: 0.9em;
@@ -91,54 +103,54 @@
 }
 
 /* --------------------------------------------- */
-/* #chatBox
-   - The white panel containing messages and the input bar.
+/* #chatBox (messages container)
+   - Blush Tan for the chat panel background
 */
 #chatBox {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: #fff;
+  background: #FFD6BA;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 /* --------------------------------------------- */
-/* #msgArea
-   - Scrollable area where all messages are appended.
+/* #msgArea (scrollable message area)
+   - Light Peach background for messages area
 */
 #msgArea {
   flex: 1;
   padding: 10px;
   overflow-y: auto;
-  background: #fafafa;
+  background: #FFF2EB;
 }
-/* .message
-   - Wrapper for each message element.
+/* .message (individual message)
+   - Margin for spacing messages
 */
 .message { margin-bottom: 6px; }
-/* .timeTag
-   - The timestamp span before each message.
+/* .timeTag (timestamp)
+   - Subtle text color
 */
 .timeTag {
-  color: #888;
+  color: #555;
   font-size: 0.75em;
   margin-right: 5px;
 }
 
 /* --------------------------------------------- */
-/* #inputBar
-   - Bottom input container holding text input and send button.
+/* #inputBar (message input bar)
+   - Soft Pink background for input controls
 */
 #inputBar {
   display: flex;
   align-items: center;
   padding: 8px;
-  background: #eee;
+  background: #FFDCDC;
 }
-/* #msgInput
-   - The text field where users type their messages.
+/* #msgInput (text input)
+   - White input with rounded corners
 */
 #msgInput {
   flex: 1;
@@ -148,17 +160,18 @@
   border-radius: 4px;
   margin-right: 4px;
   outline: none;
+  background: #FFF2EB;
 }
-/* #sendBtn
-   - Circular send button with plane icon.
+/* #sendBtn (send message button)
+   - Warm Cream button for send action
 */
 #sendBtn {
   width: 40px;
   height: 40px;
   border: none;
   border-radius: 50%;
-  background: #0084ff;
-  color: #fff;
+  background: #FFE8CD;
+  color: #333;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -167,8 +180,8 @@
 }
 
 /* --------------------------------------------- */
-/* #clearBtn
-   - Button below chatBox to clear all chat history.
+/* #clearBtn (clear chat button)
+   - Blush Tan background for prominence
 */
 #clearBtn {
   margin-top: 8px;
@@ -176,14 +189,14 @@
   padding: 12px;
   border: none;
   border-radius: 4px;
-  background: #f44336;
-  color: #fff;
+  background: #FFD6BA;
+  color: #333;
   cursor: pointer;
 }
 
 /* --------------------------------------------- */
 /* Login Inputs & Buttons
-   - Applies to inputs and buttons inside #loginView.
+   - Chat neutral styling for login controls
 */
 #loginView input,
 #loginView button {
@@ -193,6 +206,9 @@
   margin: 8px 0;
   font-size: 1em;
   box-sizing: border-box;
+  background: #FFF2EB;
+  border: none;
+  border-radius: 4px;
 }
 
   </style>
