@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Neon Card with Tracing Light</title>
+  <title>Interactive Neon Card</title>
   <style>
     :root {
       --card-width: 300px;
@@ -13,7 +13,7 @@
       --line-thickness: 3px;
       --glow-size: 8px;
       --duration: 4s;
-      --radius: 16; /* for both CSS and SVG */
+      --radius: 16; /* corner radius */
     }
 
     body {
@@ -25,7 +25,7 @@
       align-items: center;
     }
 
-    /* Rotate entire card */
+    /* Rotate the entire card 90° */
     .card-wrapper {
       transform: rotate(90deg);
     }
@@ -38,9 +38,17 @@
       border-radius: calc(var(--radius) * 1px);
       overflow: hidden;
       box-shadow: 0 0 20px rgba(0, 255, 255, 0.15);
+      cursor: pointer;
+      outline: none;                      /* remove focus outline */
+      -webkit-tap-highlight-color: transparent; /* remove mobile tap glow */
+      user-select: none;
     }
 
-    /* SVG sits on top and exactly matches the card size */
+    .card:focus {
+      outline: none;
+    }
+
+    /* SVG overlay for neon trace */
     .card svg {
       position: absolute;
       top: 0; left: 0;
@@ -48,14 +56,11 @@
       pointer-events: none;
     }
 
-    /* Style and animate the SVG path */
     .card path {
       fill: none;
       stroke: var(--neon-color);
       stroke-width: var(--line-thickness);
-      /* Total perimeter ≈ 2*(W+H−4R) + 2πR */
-      /* For 300×200 with R=16: ≈ 972px */
-      stroke-dasharray: 972;
+      stroke-dasharray: 972;     /* ≈ perimeter */
       stroke-dashoffset: 972;
       filter: drop-shadow(0 0 var(--glow-size) var(--neon-color));
       animation: trace var(--duration) linear infinite;
@@ -65,19 +70,32 @@
       to { stroke-dashoffset: 0; }
     }
 
+    /* Content area: rotate back so text reads normally */
     .content {
-      position: relative;  /* so it sits above the SVG */
+      position: relative;
+      width: 100%; height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transform: rotate(-90deg);
+      transform-origin: center center;
+    }
+
+    .content p {
+      margin: 0;
       color: #eee;
-      text-align: center;
-      padding: 1rem;
+      font-family: sans-serif;
+      font-size: 1.1rem;
+      pointer-events: none;
     }
   </style>
 </head>
 <body>
 
   <div class="card-wrapper">
-    <div class="card">
-      <!-- SVG rectangle with rounded corners -->
+    <!-- Give it tabindex so it can also receive focus if needed -->
+    <div class="card" id="neon-card" tabindex="0">
+      <!-- Neon-trace SVG -->
       <svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
         <path d="
           M16,0 
@@ -94,11 +112,33 @@
       </svg>
 
       <div class="content">
-        <h2>Neon Trace</h2>
-        <p>The light travels fluidly around the edges.</p>
+        <p>Tap to <br> Change Colour</p>
       </div>
     </div>
   </div>
+
+  <script>
+    const card = document.getElementById('neon-card');
+
+    card.addEventListener('click', () => {
+      // Random HSL for background
+      const h1 = Math.floor(Math.random() * 360);
+      const s1 = 60;
+      const l1 = 30 + Math.random() * 40; // between 30–70
+      const bg = `hsl(${h1}, ${s1}%, ${l1}%)`;
+      card.style.background = bg;
+
+      // Random HSL for neon
+      const h2 = Math.floor(Math.random() * 360);
+      const s2 = 80;
+      const l2 = 60;
+      const neon = `hsl(${h2}, ${s2}%, ${l2}%)`;
+      card.style.setProperty('--neon-color', neon);
+    });
+
+    // Also remove focus outline on keyboard focus
+    card.addEventListener('focus', () => card.style.outline = 'none');
+  </script>
 
 </body>
 </html>
