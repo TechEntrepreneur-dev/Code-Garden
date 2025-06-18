@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Neon Edge Card</title>
+  <style>
+    :root {
+      --card-width: 300px;
+      --card-height: 200px;
+      --card-bg: #1a1a1a;
+      --neon-color: #0ff; /* cyan neon */
+      --line-thickness: 3px;
+      --anim-duration: 2s;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background: #111;
+      font-family: sans-serif;
+    }
+
+    .card {
+      position: relative;
+      width: var(--card-width);
+      height: var(--card-height);
+      background: var(--card-bg);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+    }
+
+    /* Neon line at top edge */
+    .card::before,
+    /* Neon line at bottom edge */
+    .card::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: var(--line-thickness);
+      background: var(--neon-color);
+    }
+
+    .card::before {
+      top: 0;
+      transform: translateX(-100%);
+      animation: slide-right var(--anim-duration) linear infinite;
+    }
+
+    .card::after {
+      bottom: 0;
+      transform: translateX(100%);
+      animation: slide-left var(--anim-duration) linear infinite;
+    }
+
+    @keyframes slide-right {
+      from { transform: translateX(-100%); }
+      to   { transform: translateX(100%); }
+    }
+
+    @keyframes slide-left {
+      from { transform: translateX(100%); }
+      to   { transform: translateX(-100%); }
+    }
+
+    /* Content styling (optional) */
+    .card .content {
+      color: #eee;
+      padding: 1rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="content">
+      <h2>Neon Card</h2>
+      <p>Two neon lines slide along the edges.</p>
+    </div>
+  </div>
+
+</body>
+</html>
