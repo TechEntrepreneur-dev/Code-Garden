@@ -3,11 +3,65 @@
     <title>
       Flex Task
     </title>
+    <style>
+    body::selection {
+      background-color: #b467fa;
+      color: white;
+    }
+      h2, h5 {
+        font-weight: normal;
+      }
+      h3 {
+        font-weight: 500;
+      }
+      p {
+        font-weight: 300;
+      }
+      .container{
+        display: flex;
+        margin: 6px;
+        gap: 12px;
+      }
+      .container>div {
+        background-color: white;
+        box-shadow: 0.5px 1.5px 2.5px 1.5px grey;
+        border-radius: 6px;
+        padding: 9px;
+        margin: 9px;
+      }
+      @media screen and (max-width: 600px)
+      {
+        .container {
+          display: block;
+        }
+      }
+    </style>
   </head>
   <body>
     <center>
-    <h1>Our Services</h1>
+    <h2>Our Services</h2>
     <h5>Build your next project with our solutions to your imaginations.</h5>
     </center>
+    <div class="container">
+      <div>
+        <h3>UX/UI Design</h3>
+      <p>User Experience design makes sure that the user’s interaction with the product encourages completion of the products’ tasks. The visual presentation of the user interface
+      </p>
+      <font color="#b467fa">Read more ›</font>
+      </div>
+      <div>
+        <h3>Web Design & Development</h3>
+        <p>The first step towards building your online presence is creating a well-designed and professional website. We are having expertise in web design and development services
+        </p>
+        <font color="#b467fa">Read more ›</font>
+        </div>
+      <div>
+        <h3>PSD to HTML Converstion</h3>
+        <p>
+          People mostly focus on the latest technology which is easy to complete their work. Get the best services to convert PSD to HTML. Our team converts your layered files into HTML
+        </p>
+        <font color="#b467fa">Read more ›</font>
+        </div>
+    </div>
   </body>
 </html>
