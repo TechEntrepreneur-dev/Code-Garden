@@ -1,98 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>Exact Grid Replica</title>
-  <style>
-    .container {
-      display: grid;
-      /* 4 rows: top bar, big middle, small widget row, bottom bar */
-      grid-template-rows: 10%  sixty% 15% 15%;
-      /* 5 columns: nav | mid1 | mid2 | mid3 | button */
-      grid-template-columns: 10% 30% 20% 30% 10%;
-      height: 90vh;
-      gap: 2px;
-    }
+<style>
+  .Container {
+    display: grid;
+    height: 90vh;
+    grid-template-rows: 10% 80% 10%;
+    grid-template-columns: 50% 50%;
+    gap: 3px;
+  }
+  .Header {
+    background-color: #1a8ace;
+    grid-row: 1/2;
+    grid-column: 1/3;
+  }
+  .LeftNav {
+    background-color: pink;
+    grid-row: 2/3;
+    grid-column: 1/2;
+  }
+  .RightNav {
+    background-color: Red;
+    grid-row: 2/3;
+    grid-column: ;
+  }
+  .Footer {
+    background-color: #20a367;
+    grid-row: 3/4;
+    grid-column: 1/3;
+  }
+  
+</style>
 
-    /* give each section a visible background */
-    .header     { background: #4A90E2; /* blue */ }
-    .search-btn { background: #003F7D; /* dark-blue */ }
-    .nav        { background: #E94E3E; /* red */ }
-    .mid1       { background: #F8E71C; /* yellow */ }
-    .mid2       { background: #50E3C2; /* green */ }
-    .mid3       { background: #BD10E0; /* magenta */ }
-    .wid1       { background: #F5A623; /* orange */ }
-    .wid2       { background: #7B8D8E; /* grey */ }
-    .wid3       { background: #417505; /* dark-green */ }
-    .footer     { background: #9013FE; /* purple */ }
-
-    /* Positioning each box */
-
-    /* Top bar + button */
-    .header {
-      grid-row:    1 / 2;
-      grid-column: 1 / 5;  /* spans col1–4 (10+30+20+30 = 90%) */
-    }
-    .search-btn {
-      grid-row:    1 / 2;
-      grid-column: 5 / 6;  /* the rightmost 10% */
-    }
-
-    /* Second row: nav + three mid boxes */
-    .nav {
-      grid-row:    2 / 3;
-      grid-column: 1 / 2;
-    }
-    .mid1 {
-      grid-row:    2 / 3;
-      grid-column: 2 / 3;
-    }
-    .mid2 {
-      grid-row:    2 / 3;
-      grid-column: 3 / 4;
-    }
-    .mid3 {
-      grid-row:    2 / 3;
-      grid-column: 4 / 5;
-    }
-
-    /* Third row: three widgets */
-    .wid1 {
-      grid-row:    3 / 4;
-      grid-column: 1 / 3;  /* nav + mid1 width */
-    }
-    .wid2 {
-      grid-row:    3 / 4;
-      grid-column: 3 / 4;
-    }
-    .wid3 {
-      grid-row:    3 / 4;
-      grid-column: 4 / 5;
-    }
-
-    /* Bottom footer */
-    .footer {
-      grid-row:    4 / 5;
-      grid-column: 1 / 6;  /* spans all 5 columns */
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">Header / Search Bar</div>
-    <div class="search-btn">▢</div>
-
-    <div class="nav">Left Nav</div>
-    <div class="mid1">Promo</div>
-    <div class="mid2">Main</div>
-    <div class="mid3">Aside</div>
-
-    <div class="wid1">Widget 1</div>
-    <div class="wid2">Widget 2</div>
-    <div class="wid3">Widget 3</div>
-
-    <div class="footer">Footer</div>
-  </div>
-</body>
-</html>
+<div class="Container">
+  <div class="Header">Header</div>
+  <div class="LeftNav">Left Nav</div>
+  <div class="RightNav">Right Nav</div>
+  <div class="Footer">Footer</div>
+</div>
