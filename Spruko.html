@@ -1,0 +1,122 @@
+<html>
+  <head>
+    <title>
+      Flex Task
+    </title>
+    <style>
+    body::selection {
+      background-color: #b467fa;
+      color: white;
+    }
+      h2, h5 {
+        font-weight: normal;
+      }
+      h3 {
+        font-weight: 500;
+      }
+      p {
+        font-weight: 300;
+      }
+      .container{
+        display: flex;
+        margin: 6px;
+        gap: 12px;
+      }
+      .container>div {
+        background-color: white;
+        box-shadow: 0.5px 1.5px 2.5px 1.5px grey;
+        border-radius: 6px;
+        padding: 9px;
+        margin: 9px;
+      }
+      @media screen and (max-width: 600px)
+      {
+        .container {
+          display: block;
+        }
+      }
+      img {
+        height: 30px;
+        width: 30px;
+        margin: 5px;
+        padding: 6px;
+        transform: rotate(0deg);
+      }
+      .icon1bg {
+        height: 50px;
+        width: 50px;
+        border: 1px solid purple;
+        margin: 5px;
+        border-radius: 18px;
+        transition: 5s;
+      }
+      .div1:hover .icon1bg {
+        transform: rotate(360deg);
+      }
+      .icon2bg {
+        height: 50px;
+        width: 50px;
+        border: 1px solid purple;
+        margin: 5px;
+        border-radius: 18px;
+        transition: 5s;
+      }
+      .div2:hover .icon2bg {
+        transform: rotate(360deg);
+      }
+      .icon3bg {
+        height: 50px;
+        width: 50px;
+        border: 1px solid purple;
+        margin: 5px;
+        border-radius: 18px;
+        transition: 5s;
+      }
+      .div3:hover .icon3bg {
+        transform: rotate(360deg);
+      }
+    </style>
+  </head>
+  <body>
+    <center>
+    <h2>Our Services</h2>
+    <h5>Build your next project with our solutions to your imaginations.</h5>
+    </center>
+    <div class="container">
+      <div class="div1">
+        <div class="icon1bg">
+          <span class="static-img">
+            <img src="19327739341638193673-64.png">
+          </span>
+        </div>
+        <h3>UX/UI Design</h3>
+      <p>User Experience design makes sure that the user’s interaction with the product encourages completion of the products’ tasks. The visual presentation of the user interface
+      </p>
+      <font color="#b467fa">Read more ›</font>
+      </div>
+      <div class="div2">
+        <div class="icon2bg">
+          <span>
+            <img src="17015288341638193676-64.png">
+          </span>
+        </div>
+        <h3>Web Design & Development</h3>
+        <p>The first step towards building your online presence is creating a well-designed and professional website. We are having expertise in web design and development services
+        </p>
+        <font color="#b467fa">Read more ›</font>
+        </div>
+      <div class="div3">
+        <div class="icon3bg">
+          <span>
+            <img src="8804286661557996995-64.png">
+          </span>
+        </div>
+        <h3>PSD to HTML Converstion</h3>
+        <p>
+          People mostly focus on the latest technology which is easy to complete their work. Get the best services to convert PSD to HTML. Our team converts your layered files into HTML
+        </p>
+        <font color="#b467fa">Read more ›</font>
+        </div>
+    </div>
+  </body>
+</html>
